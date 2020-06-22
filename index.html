@@ -1,1 +1,25 @@
-<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel=icon href=favicon.ico><title>xkazer-home</title><link href=css/app.css rel=preload as=style><link href=css/chunk-vendors.css rel=preload as=style><link href=js/app.js rel=preload as=script><link href=js/chunk-vendors.js rel=preload as=script><link href=css/chunk-vendors.css rel=stylesheet><link href=css/app.css rel=stylesheet></head><body><noscript><strong>We're sorry but xkazer-home doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id=app></div><script src=js/chunk-vendors.js></script><script src=js/app.js></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/skeleton.css">
+  <title>Tools</title>
+</head>
+<body>
+  <div class="main">
+    <div class="row">
+      <input id="url" type="text" class="input offset-by-one ten columns" />
+    </div>
+    <dic class="row">
+      <button class="button-primary offset-by-five two columns" onclick="Open()">打开</button>
+    </dic>
+  </div>
+  <script>
+    function Open(){
+      var text = document.getElementById('url').value;
+      window.location.href=text;
+    }
+  </script>
+</body>
+</html>
