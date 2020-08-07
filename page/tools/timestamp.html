@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="../../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../../css/pikaday.css">
+  <title>时间戳工具</title>
+  <script src="../../js/pikaday.js"></script>
+  <script src="../../js/util.js"></script>
+  <style>
+    body{
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <!-- 时间戳转时间 -->
+    <div name="to-time">
+      <div class="row">
+        <h3 class="twelve columns">时间戳转时间</h1>
+      </div>
+      <div class="row">
+        <span class="offset-by-three">时间戳</span>
+        <input type="text" id="in-timestamp" value="0"></input>
+      </div>
+      <div class="row">
+        <input type="checkbox" id="dw-ms" class="offset-by-three">
+        <label for="dw-ms">毫秒</label>
+        <input type="checkbox" id="zone">
+        <label for="zone">时区</label>
+      </div>
+      <div class="row">
+        <button class="button-primary offset-by-three" onClick="transToTime()">转换</button>
+      </div>
+      <div class="row">
+        <span class="offset-by-three" id="out-time"></span>
+      </div>
+    </div>
+    
+    <br><br><br>
+    <!-- 时间转时间戳 -->
+    <div name="to-timestamp">
+      <div class="row">
+        <h3 class="twelve columns">时间转时间戳</h1>
+      </div>
+      <div class="row">
+        <span class="offset-by-three">选择日期</span>
+        <input type="text" id="in-date"></input>
+      </div>
+      <div class="row">
+        <button class="button-primary offset-by-three" onClick="transToTimeStamp()">转换</button>
+      </div>
+      <div class="row">
+        <span class="offset-by-three" id="out-timestamp"></span>
+      </div>
+    </div>
+  </div>
+  <script>  
+    new Pikaday({
+      field: document.getElementById('in-date'),
+      format: 'yyyy-MM-dd hh:mm:ss',
+      toString(date, format){
+        return date.Format(format);
+      }
+    });
+    document.getElementById('in-date').value = new Date().Format("yyyy-MM-dd hh:mm:ss")
+
+    function transToTime(){
+      var inTimeStamp = document.getElementById("in-timestamp").value;
+      if (inTimeStamp.startsWith("0x")){
+        inTimeStamp = parseInt(inTimeStamp, 16);
+      }else{
+        inTimeStamp = parseInt(inTimeStamp);
+      }
+      if (document.getElementById("zone").checked){
+        inTimeStamp = inTimeStamp - (3600 * 8)
+      }
+      if (!document.getElementById("dw-ms").checked){
+        inTimeStamp = inTimeStamp * 1000;
+      }
+      var date = new Date(inTimeStamp);
+      document.getElementById("out-time").textContent = date.toLocaleString();
+    }
+
+    function transToTimeStamp(){
+      var date = new Date(document.getElementById("in-date").value);
+      var secs = date.getTime() / 1000;
+      document.getElementById("out-timestamp").innerHTML=secs+"<br>0x"+secs.toString(16).toUpperCase();
+    }
+  </script>  
+</body>
+</html>
