@@ -1,0 +1,19 @@
+{
+  "name": "xkazer.github.io",
+  "version": "1.0.0",
+  "description": "[进入主页](https://xkazer.github.io)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xkazer/xkazer.github.io.git"
+  },
+  "author": "xkazer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xkazer/xkazer.github.io/issues"
+  },
+  "homepage": "https://github.com/xkazer/xkazer.github.io#readme"
+}

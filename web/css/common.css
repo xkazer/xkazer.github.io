@@ -1,0 +1,35 @@
+
+.secret {
+  color: #fff;
+}
+
+.header h6 {
+  margin-top: 15px;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.nav .row {
+  margin: 5px 0;
+}
+
+.nav ul {
+  display: block;
+}
+
+.nav li {
+  display: inline;
+  margin: 0 10px;
+}
+
+.nav .title {
+  display: block;
+  text-align: left;
+  background-color: #dee2e6;
+}
