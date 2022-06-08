@@ -62,5 +62,5 @@ http.createServer(function (req, res) {
       });
     }	
   });
-}).listen(80, '127.0.0.1');
-console.log('Server running at http://127.0.0.1/');
+}).listen(80, '0.0.0.0');
+console.log('Server running at http://localhost/');
