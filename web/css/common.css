@@ -28,6 +28,16 @@
   margin: 0 10px;
 }
 
+.nav li.header {
+  position: absolute;
+  left: 10%;
+  font-weight: 800;
+}
+
+.nav li.header, .nav li.header a {
+  color: #6699CC;
+}
+
 .nav .title {
   display: block;
   text-align: left;
