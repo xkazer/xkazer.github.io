@@ -35,7 +35,8 @@
 }
 
 .nav li.header, .nav li.header a {
-  color: #6699CC;
+  color: #000;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .nav .title {
@@ -45,17 +46,25 @@
 }
 
 .left-flower {
-  position: absolute;
   top: -5%;
-  width: 20%;
+  width: 30%;
   opacity: 0.8;
   content: url('../png/lflower.png');
 }
 
 .woman {
-  position: absolute;
   bottom: 0;
   right: 6%;
   opacity: 0.8;
   content: url('../png/woman.png');
+}
+
+div.bg {
+  position: absolute;
+  z-index: 1;
+}
+
+div.nav {
+  position: relative;
+  z-index: 2;
 }
