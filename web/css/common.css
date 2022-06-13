@@ -43,3 +43,19 @@
   text-align: left;
   background-color: #dee2e6;
 }
+
+.left-flower {
+  position: absolute;
+  top: -5%;
+  width: 20%;
+  opacity: 0.8;
+  content: url('../png/lflower.png');
+}
+
+.woman {
+  position: absolute;
+  bottom: 0;
+  right: 6%;
+  opacity: 0.8;
+  content: url('../png/woman.png');
+}
