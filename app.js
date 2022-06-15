@@ -42,7 +42,7 @@ var page_500 = function(req, res, error){
 
 
 http.createServer(function (req, res) {
-  let name = req.url.match(/[0-9a-zA-Z.\/]+/)[0];
+  let name = req.url.match(/[0-9a-zA-Z.\/]+/)?.input;
   if (!name || name === '/') name = '/index.html';
   var realPath = __dirname +  "/web" + name;
   fs.access(realPath, fs.constants.R_OK, function(error){
