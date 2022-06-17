@@ -68,3 +68,16 @@ div.nav {
   position: relative;
   z-index: 2;
 }
+
+div.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+div.footer a {
+  color: #666;
+  cursor: default;
+  text-decoration: none;
+  font-size: 12px
+}
