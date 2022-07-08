@@ -1,83 +1,86 @@
+/** 全局样式 */
+ul li {
+  list-style-type: none;
+}
 
-.secret {
+/** 标题菜单样式 */
+header nav ul {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+header nav ul li {
+  float: right;
+  margin: 0;
+  margin-right: 20px;
+  z-index: 10;
+}
+
+header nav ul li a {
+  color: #000;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 50px;
+  text-decoration: none;
+}
+
+header nav ul li:nth-child(odd){
+  margin-top: 50px;
+}
+
+header nav ul li:nth-child(odd) a{
   color: #fff;
 }
 
-.header h6 {
-  margin-top: 15px;
-}
-
-.align-right {
-  text-align: right;
-}
-
-.align-left {
-  text-align: left;
-}
-
-.nav .row {
-  margin: 5px 0;
-}
-
-.nav ul {
-  display: block;
-}
-
-.nav li {
-  display: inline;
-  margin: 0 10px;
-}
-
-.nav li.header {
+/** 主页图片 */
+header nav img.header {
   position: absolute;
-  left: 10%;
-  font-weight: 800;
-}
-
-.nav li.header, .nav li.header a {
-  color: #000;
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.nav .title {
-  display: block;
-  text-align: left;
-  background-color: #dee2e6;
-}
-
-.left-flower {
-  top: -5%;
-  width: 30%;
-  opacity: 0.8;
-  content: url('../png/lflower.png');
-}
-
-.woman {
-  bottom: 0;
-  right: 6%;
-  opacity: 0.8;
-  content: url('../png/woman.png');
-}
-
-div.bg {
-  position: absolute;
-  z-index: 1;
-}
-
-div.nav {
-  position: relative;
-  z-index: 2;
-}
-
-div.footer {
-  position: fixed;
-  bottom: 0;
+  left: 0;
+  top: 50px;
   width: 100%;
+  height: calc(50% + 50px);
+  content: url('../png/nature.jpg');
+  z-index: 5;
 }
 
-div.footer a {
-  color: #666;
-  cursor: default;
-  text-decoration: none;
-  font-size: 12px
+/** 主页标题 */
+header nav div.title {
+  position: absolute;
+  top: 75px;
+  left: 25px;
+  color: #fff;
+  font-size: 60px;
+  font-weight: 700;
+  text-shadow: 10px 5px 5px black;
+  z-index: 10;
+}
+
+div.content {
+  position: absolute;
+  top: calc(50% + 50px);
+  left: 50%;
+  color: #000;
+  width: auto;
+  font-size: 30px;
+  z-index: 10;
+}
+
+div.content div:first-child {
+  color: #fff;
+  transform: translate(-100%);
+}
+
+/** 底部 */
+footer {
+  position: absolute;
+  left: 5%;
+  bottom: 0;
+  width: 90%;
+  text-align: center;
+}
+
+footer a, footer a:hover, footer a:active {
+  color: #aaa;
+  font-size: 11px;
 }
