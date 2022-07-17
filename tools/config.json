@@ -1,0 +1,13 @@
+{
+  "markdownDir": "../md",
+  "markdownTemplate": "../web/template/markdown.html",
+  "indexTemplate": "../web/template/index.html",
+  "outoutDir": "../web/doc",
+  "outputIndex": "../web/index.html",
+  "variable": "<!--%MARKDOWN%-->",
+  "titleMap": {
+    "study": "学习",
+    "note": "笔记",
+    "hole": "树洞"
+  }
+}

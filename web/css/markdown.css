@@ -8,6 +8,13 @@ a:hover {
 }
 
 /** 标题菜单样式 */
+header {
+  height: 200px;
+  background-position-y: 200px;
+  background-image: linear-gradient(to bottom, #fff 25%, #000 20%, #77f, #aaf, #fff);
+  border-radius: 0 0 180px 0;
+}
+
 header nav ul {
   position: absolute;
   top: 0;
@@ -36,17 +43,6 @@ header nav ul li:nth-child(odd) a{
   color: #fff;
 }
 
-/** 主页图片 */
-header nav img.header {
-  position: absolute;
-  left: 0;
-  top: 2.5em;
-  width: 100%;
-  height: 70%;
-  content: url('../png/nature.jpg');
-  z-index: 5;
-}
-
 /** 主页标题 */
 header nav div.title {
   position: absolute;
@@ -59,28 +55,15 @@ header nav div.title {
   z-index: 10;
 }
 
-div.content {
-  position: absolute;
-  top: 70%;
-  left: 50%;
-  color: #000;
-  width: auto;
-  font-size: 1.5em;
-  z-index: 10;
-}
-
-div.content div:first-child {
+header nav div.title a, header nav div.title a:hover, header nav div.title a:active {
   color: #fff;
-  transform: translate(-100%);
+  text-decoration: none;
 }
 
 /** Markdown列表样式 */
 div.markdown {
-  position: absolute;
   width: 100%;
-  top: calc(70% + 180px);
 }
-
 div.markdown .title {
   text-align: right;
 }
@@ -91,18 +74,19 @@ div.markdown a:hover {
   text-decoration: underline;
 }
 
-/** 底部 */
-footer {
-  position: absolute;
-  left: 5%;
-  bottom: 0;
-  width: 90%;
+/** Markdown样式 */
+h2, h3{
   text-align: center;
 }
 
-footer a, footer a:hover, footer a:active {
-  color: #aaa;
-  font-size: 0.4em;
+p {
+  text-indent: 2em;
+  margin: 0;
+  padding: 0;
+}
+
+p::first-letter {
+  font-weight: 600;
 }
 
 /** 最小尺寸 */
