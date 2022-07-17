@@ -63,6 +63,7 @@ header nav div.title a, header nav div.title a:hover, header nav div.title a:act
 /** Markdown列表样式 */
 div.markdown {
   width: 100%;
+  background-color: #fff;
 }
 div.markdown .title {
   text-align: right;

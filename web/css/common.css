@@ -5,5 +5,7 @@ ul li {
 
 body {
   display: flex;
+  height: 100%;
   justify-content: center;
+  background-image: url("../png/bg.png");
 }

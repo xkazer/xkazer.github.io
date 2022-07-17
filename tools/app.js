@@ -86,7 +86,7 @@ function generateMarkdownList(name, list, count, pathfix) {
 function generateMarkdownMenu(sub = null, count = 0, pathfix = '') {
   let renderStr = "";
   g_doc_map.forEach((list, key) => {
-    if (!sub || sub === key) {
+    if ((!sub && key !== 'hole') || sub === key) {
       renderStr += generateMarkdownList(key, list, count, pathfix);
     }
   });

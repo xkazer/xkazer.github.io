@@ -79,6 +79,7 @@ div.markdown {
   position: absolute;
   width: 100%;
   top: calc(70% + 180px);
+  background-color: #fff;
 }
 
 div.markdown .title {
