@@ -44,7 +44,7 @@ var page_500 = function(req, res, error){
 http.createServer(function (req, res) {
   let name = req.url.match(/[0-9a-zA-Z.\/]+/)?.input;
   if (!name || name === '/') name = '/index.html';
-  var realPath = __dirname +  "/web" + name;
+  var realPath = __dirname +  "/web" + decodeURI(name);
   fs.access(realPath, fs.constants.R_OK, function(error){
     if(error){
       console.log(req.url, realPath);
