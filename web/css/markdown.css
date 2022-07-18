@@ -79,6 +79,9 @@ div.markdown a:hover {
 h2, h3{
   text-align: center;
 }
+h2, h3, h4, h5, h6 {
+  color: #00f;
+}
 
 p {
   text-indent: 2em;

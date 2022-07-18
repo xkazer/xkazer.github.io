@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../css/prism.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/common.css">
+  <link rel="stylesheet" type="text/css" href="../css/markdown.css">
+  <title>xkazer</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">关于</a></li>
+          <li><a href="../doc/note.html">笔记</a></li>
+          <li><a href="../doc/study.html">学习</a></li>
+          <li><a href="../page/home.html">导航</a></li>
+        </ul>
+        <div class="title"><a href="../index.html">xkazer</a></div>
+      </nav>
+    </header>
+    <div class="markdown">
+      <h2>Electron小炒</h2>
+<h4>Electron禁用同策略</h4>
+<pre><code class="language-JavaScript">app.commandLine.appendSwitch('disable-site-isolation-trials');
+</code></pre>
+<h4>启用nodejs并关闭安全</h4>
+<pre><code class="language-JavaScript">webPreferences: {
+      nodeIntegration: true,
+      webSecurity: false,
+}
+</code></pre>
+<h4>window 7上黑屏</h4>
+<p>原因: GPU进程崩溃(常见于电脑性能不够好或者是显卡设备出现问题)</p>
+<p>解决:</p>
+<ul>
+<li>方案一:  禁用硬件加速:  app.disableHardwareAcceleration();</li>
+<li>方案二:  程序启动时，加上参数&quot;--disable-gpu&quot;</li>
+<li>方案三:  设置程序 Vista 兼容模式</li>
+</ul>
+<h4>node-gyp安装失败</h4>
+<p>需要使用python 2.7.xx</p>
+<h4>渲染进程require is not defined</h4>
+<p>官方为了安全性，将 electron v12.0.0 的 contextIsolation 的默认值改了。所以今后要在渲染进程里调用 require 的话，还需要加上 contextIsolation: false。</p>
+
+    </div>
+  </div>
+  <script src="../js/prism.js"></script>
+</body>
+</html>
