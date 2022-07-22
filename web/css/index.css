@@ -50,8 +50,8 @@ header nav img.header {
 /** 主页标题 */
 header nav div.title {
   position: absolute;
-  top: 75px;
-  left: 25px;
+  top: 1.25em;
+  left: 1.25em;
   color: #fff;
   font-size: 3em;
   font-weight: 700;
@@ -78,7 +78,7 @@ div.content div:first-child {
 div.markdown {
   position: absolute;
   width: 100%;
-  top: calc(70% + 180px);
+  top: calc(70% + 9em);
   background-color: #fff;
 }
 
@@ -121,7 +121,7 @@ div.app {
     position: relative;
     width: 960px;
     height: 540px;
-    font-size: 20px;
+    font-size: 1em;
   }
 }
 
@@ -130,6 +130,6 @@ div.app {
     position: relative;
     width: 1280px;
     height: 720px;
-    font-size: 25px;
+    font-size: 1.25em;
   }
 }
