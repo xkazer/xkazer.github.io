@@ -1,6 +1,6 @@
 {
   "homeTemplate": "../web/template/home.html",
-  "output": "../web/page/home.html",
+  "output": "../web/home.html",
   "variable": "<!--%LINKS%-->",
   "links": {
     "开发语言": {
