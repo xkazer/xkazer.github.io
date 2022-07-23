@@ -1,0 +1,89 @@
+
+/** 通用 */
+div.main {
+  margin-top: 30vh;
+}
+
+input[type="button"] {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/** 搜索区 */
+div.search-form {
+  position: relative;
+  width: 60em;
+}
+
+select.search-type {
+  appearance: none;
+  margin: 0;
+  background: transparent;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  background-position: 0.5em;
+  padding-left: 2.5em;
+  border: none;
+  min-width: 8em;
+}
+
+select.search-type[type="baidu"] {
+  background-image: url("http://www.baidu.com/favicon.ico");
+}
+select.search-type[type="bing"] {
+  background-image: url("http://www.bing.com/favicon.ico");
+}
+select.search-type[type="google"] {
+  background-image: url("http://www.google.com/favicon.ico");
+}
+
+div.search-form .search-ico {
+  margin-top: 0.5em;
+  margin-left: 0.5em;
+  width: 2em;
+  height: 2em;
+  background-image: url('https://www.bing.com/favicon.ico');
+  background-size: contain;
+}
+
+div.search-form .search-text {
+  width: 50em;
+  border-radius: 1.5em;
+  padding-left: 2em;
+}
+
+div.search-form .search-btn {
+  position: absolute;
+  right: 6em;
+  top: 0.75em;
+  width: 3em;
+  height: 3em;
+  background-image: url('../png/search.png');
+  background-repeat: no-repeat;
+}
+
+/** 导航区 */
+ul.categorys li {
+  display: inline-block;
+}
+
+ul.categorys li:focus-within ul.link {
+  display: block;
+}
+
+ul.link {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  display: none;
+  justify-content: center;
+}
+
+ul.link li {
+  margin: 0 2em;
+  padding-left: 2em;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  bac
+}

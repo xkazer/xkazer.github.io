@@ -1,0 +1,37 @@
+{
+  "homeTemplate": "../web/template/home.html",
+  "output": "../web/page/home.html",
+  "variable": "<!--%LINKS%-->",
+  "links": {
+    "开发语言": {
+      "【Web】HTML/CSS": "https://www.w3school.com.cn/h.asp",
+      "【Web】Javascrip接口": "https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects",
+      "NodeJS": "https://nodejs.org/docs/latest-v14.x/api/",
+      "Electron": "https://www.electronjs.org/zh/docs/latest/api/app",
+      "【Android】Developer": "https://developer.android.com/guide/components/activities/intro-activities",
+      "【Android】Kotlin": "https://developer.android.com/kotlin/learn"
+    },
+    "开发工具": {
+      "VSCode": "https://code.visualstudio.com/",
+      "TortoiseGit": "https://tortoisegit.org/"
+    },
+    "常用模块": {
+      "【Web】Skeleton": "http://getskeleton.com/",
+      "【Web】Prismjs": "https://prismjs.com/",
+      "【Web】pixi": "https://pixijs.com/",
+      "【Nodejs】commander": "https://github.com/tj/commander.js/blob/HEAD/Readme_zh-CN.md",
+      "【Nodejs】node-fetch": "https://github.com/node-fetch/node-fetch",
+      "【Nodejs】cheerio": "https://github.com/cheeriojs/cheerio/wiki/Chinese-README"
+    },
+    "常用插件": {
+      "【VSCode】Emmet": "https://docs.emmet.io/abbreviations/syntax/",
+      "【VSCode】ProjectManager": "https://github.com/alefragnani/【VSCode】project-manager",
+      "【VSCode】GitLens": "https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens"
+    },
+    "常用记录": {
+      "【Web】配色": "http://tool.c7sky.com/webcolor/",
+      "【Mac】快捷键": "https://www.jianshu.com/p/b71f8ce0336a",
+      "【Web】pixijs": "https://segmentfault.com/blog/pixijs"
+    }
+  }
+}

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const MarkdownIt = require('markdown-it');
 /** 全局变量 */
-const g_config = require('./config.json');
+const g_config = require('./markdown.json');
 const g_doc_map = new Map();
 let g_markdown_template = '';
 let g_index_template = '';
