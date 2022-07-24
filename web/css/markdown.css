@@ -73,6 +73,7 @@ div.markdown .title {
 }
 div.markdown a {
   display: block;
+  margin: 1em;
 }
 div.markdown a:hover {
   text-decoration: underline;
