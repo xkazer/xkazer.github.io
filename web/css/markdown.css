@@ -65,6 +65,9 @@ div.markdown {
   width: 100%;
   background-color: #fff;
 }
+div.markdown ul {
+  background-color: rgba(69,142,209,.04);
+}
 div.markdown .title {
   text-align: right;
 }
