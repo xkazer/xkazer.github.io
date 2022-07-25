@@ -6,9 +6,10 @@ g_search_map = {
 };
 
 /** 搜索 */
-function onSearchTypeChange() {
+function onSearchTypeChange(save = true) {
   const searchType = document.getElementById('searchType');
   searchType.setAttribute('type', searchType.value);
+  save && localStorage.setItem('searchType', searchType.value);
 }
 
 function onSearch() {
@@ -19,5 +20,8 @@ function onSearch() {
 
 
 window.onload = () => {
-  onSearchTypeChange();
+  const searchType = document.getElementById('searchType');
+  const saveType = localStorage.getItem('searchType') || 'bing';
+  searchType.value = saveType;
+  onSearchTypeChange(false);
 }
