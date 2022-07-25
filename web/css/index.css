@@ -52,10 +52,14 @@ header nav div.title {
   position: absolute;
   top: 1.25em;
   left: 1.25em;
+  padding-left: 1em;
   color: #fff;
   font-size: 3em;
-  font-weight: 700;
-  text-shadow: 10px 5px 5px black;
+  text-shadow: 2px 2px 2px black;
+  background-image: url(../png/logo.png);
+  background-size: 1em;
+  background-repeat: no-repeat;
+  background-position: left 70%;
   z-index: 10;
 }
 
