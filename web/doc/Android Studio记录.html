@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link href="../css/prism.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/common.css">
+  <link rel="stylesheet" type="text/css" href="../css/markdown.css">
+  <title>xkazer</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">关于</a></li>
+          <li><a href="../doc/note.html">笔记</a></li>
+          <li><a href="../doc/study.html">学习</a></li>
+          <li><a href="../home.html">导航</a></li>
+        </ul>
+        <div class="title"><a href="../index.html">kazer</a></div>
+      </nav>
+    </header>
+    <div class="markdown">
+      <h2>Android Studio记录</h2>
+<h4>编译问题排除</h4>
+<h5>依赖库找不到</h5>
+<pre><code class="language-Shell">./gradlew build --stacktrack
+</code></pre>
+<h5>Manifest merger failed with multiple errors, see logs</h5>
+<p>可以使用命令行排查详细错误</p>
+<pre><code class="language-Shell">./gradlew processDebugManifest --stacktrace
+</code></pre>
+<h5>env:bash\r: No such file or directory</h5>
+<p>执行./gradlew时报此错误时，可修改文件格式</p>
+<pre><code class="language-Shell">vim gradlew
+:set fileformat=unix
+:wq
+</code></pre>
+<h5>Manifest merger failed : uses-sdk:minSdkVersion 21 cannot be smaller than version 23 declared in library</h5>
+<p>除升级minSdkVersion外，可在AndroidManifest.xml文件中 标签中添加</p>
+<pre><code class="language-Xml">&lt;uses-sdk tools:overrideLibrary=&quot;xxx.xxx.xxx&quot;/&gt;
+</code></pre>
+<p>其中的xxx.xxx.xxx为第三方库包名
+如果存在多个库有此异常，则用逗号分割它们，例如：</p>
+<pre><code class="language-Xml">&lt;uses-sdk tools:overrideLibrary=&quot;xxx.xxx.aaa, xxx.xxx.bbb&quot;/&gt;
+</code></pre>
+
+    </div>
+  </div>
+  <script src="../js/prism.js"></script>
+</body>
+</html>
