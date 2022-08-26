@@ -47,7 +47,7 @@ http.createServer(function (req, res) {
   var realPath = __dirname +  "/web" + decodeURI(name);
   fs.access(realPath, fs.constants.R_OK, function(error){
     if(error){
-      console.log(req.url, realPath);
+      console.log(new Date().toLocaleString(), req.socket.remoteAddress, req.url, realPath);
       return page_404(req, res, name);
     } else {
       var file = fs.createReadStream(realPath);
