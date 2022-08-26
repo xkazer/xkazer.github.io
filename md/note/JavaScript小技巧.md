@@ -51,3 +51,38 @@ console.log('data:', data); // data: noData
 // 或运算符针对的是falsy类的值 (0,’ ’, null, undefined, false, NaN)
 // 而空值合并仅针对null和undefined生效；
 ```
+
+##### 监听DOM节点尺寸变更
+ResizeObserver接口可以监听到 Element 的内容区域或 SVGElement的边界框改变。内容区域则需要减去内边距 padding。
+示例:
+```javascript
+this.elementRo = new ResizeObserver((entries) => {
+  this.onResize();
+});
+this.elementRo.observe(dom);
+```
+不需要时停止监听
+```javascript
+this.elementRo.disconnect();
+```
+const resizeObserver = new ResizeObserver((entries) => {
+      this.onResize();
+    });
+    resizeObserver.observe(this.$el);
+    this.elementIo = new IntersectionObserver((entries) => {
+      this.onResize();
+    });
+
+##### 监听DOM节点隐藏状态
+IntersectionObserver 接口提供了一种异步观察目标元素与其祖先元素或顶级文档视窗 (viewport) 交叉状态的方法.
+示例:
+```javascript
+this.elementIo = new IntersectionObserver((entries) => {
+  this.onResize();
+});
+this.elementRo.observe(dom);
+```
+不需要时停止监听
+```javascript
+this.elementRo.disconnect();
+```
