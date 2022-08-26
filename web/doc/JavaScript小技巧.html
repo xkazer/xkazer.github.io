@@ -79,13 +79,6 @@ this.elementRo.observe(dom);
 <p>不需要时停止监听</p>
 <pre><code class="language-javascript">this.elementRo.disconnect();
 </code></pre>
-<p>const resizeObserver = new ResizeObserver((entries) =&gt; {
-this.onResize();
-});
-resizeObserver.observe(this.$el);
-this.elementIo = new IntersectionObserver((entries) =&gt; {
-this.onResize();
-});</p>
 <h5>监听DOM节点隐藏状态</h5>
 <p>IntersectionObserver 接口提供了一种异步观察目标元素与其祖先元素或顶级文档视窗 (viewport) 交叉状态的方法.
 示例:</p>
