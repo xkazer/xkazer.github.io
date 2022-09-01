@@ -25,7 +25,22 @@
       </nav>
     </header>
     <div class="markdown">
-      <div class="title">笔记</div><div class="list"><a href="Android Studio记录.html">Android Studio记录</a><a href="Electron小抄.html">Electron小抄</a><a href="FFmpeg命令.html">FFmpeg命令</a><a href="JavaScript小技巧.html">JavaScript小技巧</a><a href="Mac笔记.html">Mac笔记</a><a href="小米使用记录.html">小米使用记录</a></div>
+      <h2>小米使用记录</h2>
+<h4>删除系统广告</h4>
+<pre><code class="language-Shell">adb shell pm uninstall --user 0 com.miui.systemAdSolution（小米系统广告解决方案，必删）
+
+adb shell pm uninstall --user 0 com.miui.analytics（小米广告分析，必删）
+</code></pre>
+<p>另外有几个包删除后必定无法开机的:</p>
+<pre><code>com.miui.cloudservice  （小米云服务）
+
+com.xiaomi.account  （小米账户）
+
+com.miui.cloudbackup  （云备份）
+
+com.xiaomi.market  （应用市场）
+</code></pre>
+
     </div>
   </div>
   <script src="../js/prism.js"></script>
