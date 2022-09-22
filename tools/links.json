@@ -10,7 +10,8 @@
       "Electron": "https://www.electronjs.org/zh/docs/latest/api/app",
       "【Android】Developer": "https://developer.android.com/guide/components/activities/intro-activities",
       "【Android】Kotlin": "https://developer.android.com/kotlin/learn",
-      "Kotlin-CN": "https://www.kotlincn.net/docs/reference/basic-syntax.html"
+      "Kotlin-CN": "https://www.kotlincn.net/docs/reference/basic-syntax.html",
+      "Sqlite": "https://www.runoob.com/sqlite/sqlite-tutorial.html"
     },
     "开发工具": {
       "VSCode": "https://code.visualstudio.com/",
