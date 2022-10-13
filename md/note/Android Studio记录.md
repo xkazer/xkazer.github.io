@@ -39,3 +39,7 @@ vim gradlew
 如果extractNativeLibs为false时，应用的so文件不解压而且页面对齐；如果设置为true时，系统安装服务会把so文件解压到系统目录。extractNativeLibs默认值是true，但是在使用Android Gradle plugin 3.6.0 及以上，没有配置extractNativeLibs时，会把此属性重置为false。
 
 由于要动态加载Dex，Dex依赖的so没有解压到/data/app/<packagename>/lib目录下，在加载Dex是指定的libraryPath 没有so文件，所以报找不到so的异常。
+
+#### 在Android Studio 中打开 Profiler 后APP闪退
+
+打开Android Studio 中的 Device File Explorer，找到 /data/local/tmp/perfd 文件夹，删掉就可以了。
