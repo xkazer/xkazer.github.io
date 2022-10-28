@@ -79,3 +79,8 @@ this.elementRo.observe(dom);
 ```javascript
 this.elementRo.disconnect();
 ```
+
+##### 获取对象类型
+```javascript
+Object.prototype.toString.call(obj);
+```
