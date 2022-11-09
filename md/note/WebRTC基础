@@ -1,0 +1,16 @@
+
+#### 创建音视频流
+```javascript
+navigagor.getUserMedia({
+  video: true,
+  audio: true
+}, (stream) => {
+  document.querySelector("video").src = window.URL.createObjectURL(stream);
+}, onError);
+```
+
+#### 音视频设备枚举
+```
+await navigator.mediaDevices.enumerateDevices();
+```
+

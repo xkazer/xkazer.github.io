@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link href="../css/prism.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/common.css">
+  <link rel="stylesheet" type="text/css" href="../css/markdown.css">
+  <title>xkazer</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">关于</a></li>
+          <li><a href="../doc/note.html">笔记</a></li>
+          <li><a href="../doc/study.html">学习</a></li>
+          <li><a href="../home.html">导航</a></li>
+        </ul>
+        <div class="title"><a href="../index.html">kazer</a></div>
+      </nav>
+    </header>
+    <div class="markdown">
+      <h4>js基础数据类型</h4>
+<p>js一共有五种基本数据类型: undefined/null/boolean/number/string</p>
+<p>ES6中新增:</p>
+<ul>
+<li>Symbol: 代表创建后独一无二且不可变的数据类型</li>
+<li>BigInt: 可以表示任意精度格式的整数</li>
+</ul>
+<p>内存:</p>
+<ul>
+<li>栈: 原始数据类型(undefined、null、boolean、number、string)</li>
+<li>堆: 引用数据类型(对象、数组和函数)</li>
+</ul>
+<h4>isNaN和Number.isNaN区别</h4>
+<p>NaN是一个警戒值的数字:</p>
+<pre><code class="language-javascript">typeof NaN;  // &quot;number&quot;
+NaN != NaN  // true
+</code></pre>
+<p>函数isNaN会尝试将参数转换为数值，任何不能转换成数值的都会返回false，因此非数字值传入也会返回true
+Number.isNaN会先判断参数是否是数字，如果是数字再继续判断是否是NaN，否则返回是false</p>
+<pre><code class="language-javascript">isNaN('a');   // true
+Number.isNaN('a');    // false
+</code></pre>
+<h4>Array构造函数只有一个参数的表现</h4>
+<p>Array构造函数只带一个数字参数时，该参数会被作为数组的预设长度(length)，而非只充当数组中的一个元素，这样创建出一个空数组。</p>
+<pre><code class="language-javascript">Array(2)        // (2) [empty × 2]
+Array(2, 3)     // (2) [2, 3]
+</code></pre>
+<h4>其他值到字符串的转换规则</h4>
+<ul>
+<li>null 和 undefined 类型分别转换为 &quot;null&quot; 和 &quot;undefined&quot;</li>
+<li>boolean类型 true 和 false 分别转换成 &quot;true&quot; 和 &quot;false&quot;</li>
+<li>number类型直接转换，不过那些极小和极大的数字会使用指数形式</li>
+<li>Symbol类型的值直接转换，但只允许显示强制类型转换</li>
+<li>对普通对象来说，除非自行定义 toString() 方法，否则会调用 Object.prototype.toString() 返回内部属性[[Class]]的值，如&quot;[object Object]&quot;</li>
+</ul>
+<h4>其他值到数字值的转换规则</h4>
+<ul>
+<li>undefined 类型转换为NaN</li>
+<li>null 类型转换为 0</li>
+<li>boolean 类型中，true转换为1，false转换为0</li>
+<li>string 类型的值如同使用Number()函数进行转换，如果包含非数字值则转换为NaN，空字符串为0</li>
+<li>symbol 类型的值不能转换为数字，会报错</li>
+<li>对象(包括数组)会首先被转换为相应的基本类型值，如果返回的是非数字的基本类型值，则再遵循以上规则</li>
+</ul>
+<pre><code class="language-javascript">Number([2]);    // 2
+Number([2, 3]); // NaN
+Number('123a'); // NaN
+parseInt('123a'); // 123
+</code></pre>
+<h4>{}和[]的valueOf和toString结果</h4>
+<ul>
+<li>{} 的valueOf结果是{}，toString的结果是&quot;[object Object]&quot;</li>
+<li>[] 的valueOf结果是[]，toString的结果是&quot;&quot;</li>
+</ul>
+<h4>|| 和 &amp;&amp; 操作符的返回值</h4>
+<p>|| 和 &amp;&amp; 首先会对第一个操作数执行条件判断:</p>
+<ul>
+<li>|| 如果第一个条件判断为true则返回第一个操作数的值，如果为false，则返回第二个操作数的值</li>
+<li>&amp;&amp; 如果第一个条件判断为true则返回第二个操作数的值，如果为false， 则返回第一个操作数的值</li>
+</ul>
+<h4>call、apply、bind区别</h4>
+<p>call、apply、bind都可以改变this指向</p>
+<ul>
+<li>call和apply会调用函数，并改变函数内部的this指向</li>
+<li>call和apply传参不同，call传递使用逗号隔开，apply使用数组传参</li>
+<li>bind不会调用函数，返回指定this值的原函数拷贝</li>
+</ul>
+<h4>class和function区别</h4>
+<p>class和function都可以作为构造函数，通过new操作符来实例化。</p>
+<ul>
+<li>class构建函数必须使用new操作符</li>
+<li>class声明不可以提升</li>
+<li>class不可以用call、apply、bind改变执行上下文</li>
+</ul>
+<h4>使用requestAnimationFrame优化性能</h4>
+<p>现代浏览器都支持createDocumentFragment方法高效插入dom元素，并且这个方式是插入是以60Hz的频率插入的。</p>
+<p>DocumentFragments是DOM节点。它们不是主DOM树的一部分。通常的用例是创始文档片段，将元素附加到文档片段，然后将文档片段附加到DOM树。在DOM树中，文档片会被其所有的子元素所代替。
+因为文档片段存在于内存中，并不在DOM树中，所以将子元素插入到文档片档时不会引起页面回流(对元素位置和几何上的计算)。因此，使用文档片段通常会带来更好的性能。</p>
+<h4>阻塞渲染</h4>
+<p>渲染的前提是生成渲染树，所以HTML和CSS肯定会阻塞渲染。如果想渲染的越快，就越应该降低一开始需要渲染的文件大小，并且扁平层级，优化选择器。</p>
+<p>然后当浏览器在解析到script标签时，会暂停构建DOM，完成后才会从暂停的地方重新开始。也就是说，如果你想要首屏渲染的越快，就越不应该在首屏就加载JS文件，这也是都建议将script标签放在body标签底部的原因。</p>
+<p>当script标签加上<strong>defer</strong>属性之后，表示该js文件会并行下载，但是会放到HTML解析完成顺序执行，所以对于这种情况你可以把script标签放在任意位置。</p>
+<p>对于没有任何依赖的js文件可以加上<strong>async</strong>属性，表示JS文件下载和解析不会阻塞渲染。</p>
+<p>注：</p>
+<ul>
+<li>DOMContentLoaded 事件在defer脚本下载且执行结束后触发，而不会等待async脚本。</li>
+<li>CSS匹配HTML元素是一个相当复杂和有性能问题的事件。所以，DOM树要小，CSS尽量用id和class，千万不要过渡层叠下去。</li>
+<li>style、link等样式资源的下载、解析不会阻塞页面的解析，但是会阻塞页面的渲染</li>
+</ul>
+<h4>重绘(Repaint)和回流(Reflow)</h4>
+<ul>
+<li>重绘是当节点需要更改外观而不会影响布局时，比如改变color</li>
+<li>回流是布局或几何属性需要改变</li>
+</ul>
+<p>回流必定会发生重绘，重绘不一定会引发回流。回流所需的成本比重绘高得多，改变父节点里的子节点很可能会导致父节点的一系列回流。</p>
+<h4>减少重绘和回流</h4>
+<ul>
+<li>使用transform替代top</li>
+<li>使用visibility替换display:none，前者会引起重绘，后者会引发回流</li>
+<li>不要把节点的属性值放在一个循环里当作循环里的变量(例如在循环中获取offsetTop会导致回流，因为需要去获取正常的值)</li>
+<li>不要使用table布局,可能很小的一个小改动会造成整个table的重新布局</li>
+<li>动画实现的速度的选择，动画速度越快，回流次数越多，可以使用requestAnimationFrame</li>
+<li>CSS选择符从右往左匹配查找，避免节点层级过多</li>
+<li>将频繁重绘或回流的节点设置为图层(will-chage/video、iframe等)，图层能够阻止该节点的渲染行为影响别的节点。比如对于video标签，浏览器会自动将节点变为图层</li>
+<li>不要一条一条地修改DOM的样式</li>
+<li>尽量将DOM离线后修改:
+<ul>
+<li>使用documentFragment对象在在内存里操作DOM</li>
+<li>先把DOM给display:none(有一次回流)，然后修改很多次后，再显示出来</li>
+<li>clone一个DOM结点到内存里，然后改完后，再和线上的交换</li>
+</ul>
+</li>
+<li>为动画的HTML元件使用fixed或absolute的position，避免回流</li>
+</ul>
+<h4>CSS如何阻塞文档解析</h4>
+<p>理论上，既然样式表不改变DOM树，也就没有必要停下文档的解析等待它们，然而，存在一个问题，JavaScript脚本执行时可能在文档的解析过程中请求样式信息，如果样式还没有加载和解析，脚本将得到错误的值，显示这将会导致很多问题。</p>
+<p>所以如果浏览器尚未完成CSSOM的下载和构建，而我们却想在此时运行脚本，那么浏览器将延迟JavaScript脚本执行和文档解析，直至其完成CSSOM的下载和构建。也就是说，在这种情况下，浏览器会下载构建CSSOM，然后再执行JavaScript，最后再继续文档的解析</p>
+<h4>事件捕获与事件冒泡</h4>
+<pre><code class="language-javascript">/**
+ * type: 事件类型
+ * function: 事件处理程序
+ * useCapture: 指定事件在捕获或冒泡阶段执行. true: 捕获阶段, false: 默认，冒泡阶段
+ */
+element.addEventListener(type, function, useCapture);
+</code></pre>
+<ul>
+<li>冒泡是从下向上，DOM元素绑定的事件被触发时，目标元素执行后，它的父元素绑定的事件会向上顺序执行</li>
+<li>捕获是从上向下，目标元素被触发时，会从目标元素最顶层的父元素事件向下执行到目标元素</li>
+<li>先发生捕获事件，后发生冒泡事件</li>
+</ul>
+<h4>事件委托</h4>
+<p>事件委托本质上是利用了浏览器事件冒泡的机制。因为事件在冒泡过程中会上传到父节点，并且父节点可以通过事件对象获取到目标节点，因此可以把子节点的监听函数定义在父节点上，由父节点的监听函数统一处理多个子元素的事件，这种方式称为事件代理。</p>
+<h4>数组原生方法</h4>
+<ul>
+<li>数组和字符串的转换方法: toString()、toLocalString()[根据机器的本地环境来返回字符串]、join()</li>
+<li>尾部操作方法: pop()、push()[可以传入多个参数]</li>
+<li>首部操作方法: shift()、unshift()、重排序reverse()、sort()</li>
+<li>数组连接的方法: concat()[返回新数组]</li>
+<li>数组截取方法: slice()[返回新数组]</li>
+<li>数组插入方法: splice()[影响原数组]</li>
+<li>查找索引方法: indexOf()、lastIndexOf()</li>
+<li>迭代方法: every()、some()、filter()、map()、forEach()</li>
+<li>递归方法: reduce()、reduceRight()</li>
+<li>填充方法: fill()</li>
+</ul>
+<h4>V8引擎的垃圾回收机制</h4>
+<p>v8的垃圾回收机制基于分代回收机制，这个机制又基于世代假说，一个新生的对象容易早死，另一个不死的对象会活得更久。基于这个假说，v8引擎将内存分为了新生代和老生代。</p>
+<p>新创建的对象或只经历过一次的垃圾回收的对象被称为新生代。经历过很多次垃圾回收的对象被称为老生代。</p>
+<p>新生代被分为From和To两个空间，To一般是闲置的。当From空间满了的时候就会执行Scavenge算法进行垃圾回收。当我们执行垃圾回收算法的时候应用逻辑将会停止，等垃圾回收结束后再继续执行。这个算法分三步:</p>
+<ul>
+<li>首先检查From空间的存活对象，如果对象存活则判断对象是否满足晋升到老生代的条件，如果满足条件则晋升到老生代。如果不满足条件则移动To空间</li>
+<li>如果对象不存活，则释放对象的空间</li>
+<li>最后将From空间和To空间角色进行交换
+新生代对象晋升到老生代有两个条件:</li>
+<li>第一个是判断对象是否已经经过一次Scavenge回收。若经历过，则将对象从From空间复制到老生代中;若没有经历，则复制到To空间。</li>
+<li>第二个是To空间的内存使用占比是否超过限制。当对象从From空间复制到To空间时，若To空间使用超过25%，则对象直播晋升到老生代中。设置25%的原因主要是因为算法结束后，两个空间结束后会交换位置，如果To空间的内存太小，会影响后续的内存分配。
+老生代采用的标记清除法或标记压缩法。标记清除法首先会对内存中存活的对象进行标记，标记结束后清除掉那些没有标记的对象。由于标记清除后会造成很的内存碎片，不便于后面的内存分配。所以为了解决内存碎片问题引入了标记压缩法。</li>
+</ul>
+<p>由于在进行垃圾回收的时候会暂停应用的逻辑，对于新生代方法由于内存小，每次停顿的时间不会太长，但对于老生代来说每次垃圾回收的时间长，停顿会造成很大的影响。为了解决这个问题V8引入了增量标记的方法，将一次停顿进行的过程分为了多步，每次执行完一小步就让运行逻辑执行一会，就这样交替运行。</p>
+
+    </div>
+  </div>
+  <script src="../js/prism.js"></script>
+</body>
+</html>
