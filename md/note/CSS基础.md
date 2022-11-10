@@ -111,3 +111,57 @@ a标签有四种状态: 链接访问前、链接访问后、鼠标滑过、激�
 可维护性、健壮性:
 - 将相同属性的样式抽离出来，整合并通过class在页面中使用，提高页面可维护性
 - 样式和内容分离: 将css代码定义到外部css中
+
+
+#### flex
+重要概念:
+- flex容器: 设置 display: flex; 的元素
+- flex项目: flex容器内的元素
+- 主轴: 项目排列方向
+- 交叉轴
+
+flex容器的属性:
+- flex-direction: 设置主轴方向, 值: **row**、row-reverse、column、column-reverse
+- flex-wrap: 设置容器内项目是否可换行，值: **nowrap**、wrap、wrap-reverse
+- flex-flow: 上面两个的合体，默认值 : **row nowrap**
+- justify-content: 主轴对齐方式，值: **flex-start**、flex-end、center、space-between、space-around
+- align-items: 交叉轴上的对齐方式，值: **stretch**(若无高度则占满整个高度)、flex-start、flex-end、center、baseline(第一行文本基线对齐)
+- align-content: 多根轴线的对齐方式, 值: **stretch**(平分空间，且未设置高度是撑满)、flex-start、flex-end、center、space-betweeen、space-around
+
+flex项目属性
+- flex-grow: 定义项目的放大比例，默认值为0，即如果有剩余空间，也不放大
+- flex-shrink: 定义项目的缩小比例，默认值为1，即空间不足，该项目将缩小
+- flex-basis: 定义了在分配多余空间之前，项目占据的主轴空间，浏览器根据这个属性，计算主轴是否有多余的空间。值: **auto**(即项目本来的大小)
+- order: 定义项目在容器中的排列顺序，数值越小，排列越靠前，默认为0
+- align-self: 允许单个项目与其他项目不一样的对齐方式。值: **auto**(即继承父元素的align-items属性)、flex-start、flex-end、center、baseline、stretch
+
+
+#### grid
+二维布局方式，相对于使用HTML结构实现的table布局, grid布局都是在CSS中完成的
+
+重要概念:
+- grid容器
+- grid项目
+- 行
+- 列
+- 单元格
+- 网络线
+
+grid容器的属性
+- grid-template-columns
+- grid-template-rows
+- gap(column-gap、row-gap)
+- place-items(justify-items、align-items)
+- place-content(justify-content、align-content)
+- grid-template-areas
+- grid-auto-flow
+- grid-auto-columns、grid-auto-rows
+
+grid项目的属性:
+- grid-column-start、grid-column-end
+- grid-row-start、grid-row-end
+- grid-column
+- grid-row
+- grid-area
+- justify-self、align-self
+- place-self

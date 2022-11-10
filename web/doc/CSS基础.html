@@ -142,6 +142,63 @@
 <li>将相同属性的样式抽离出来，整合并通过class在页面中使用，提高页面可维护性</li>
 <li>样式和内容分离: 将css代码定义到外部css中</li>
 </ul>
+<h4>flex</h4>
+<p>重要概念:</p>
+<ul>
+<li>flex容器: 设置 display: flex; 的元素</li>
+<li>flex项目: flex容器内的元素</li>
+<li>主轴: 项目排列方向</li>
+<li>交叉轴</li>
+</ul>
+<p>flex容器的属性:</p>
+<ul>
+<li>flex-direction: 设置主轴方向, 值: <strong>row</strong>、row-reverse、column、column-reverse</li>
+<li>flex-wrap: 设置容器内项目是否可换行，值: <strong>nowrap</strong>、wrap、wrap-reverse</li>
+<li>flex-flow: 上面两个的合体，默认值 : <strong>row nowrap</strong></li>
+<li>justify-content: 主轴对齐方式，值: <strong>flex-start</strong>、flex-end、center、space-between、space-around</li>
+<li>align-items: 交叉轴上的对齐方式，值: <strong>stretch</strong>(若无高度则占满整个高度)、flex-start、flex-end、center、baseline(第一行文本基线对齐)</li>
+<li>align-content: 多根轴线的对齐方式, 值: <strong>stretch</strong>(平分空间，且未设置高度是撑满)、flex-start、flex-end、center、space-betweeen、space-around</li>
+</ul>
+<p>flex项目属性</p>
+<ul>
+<li>flex-grow: 定义项目的放大比例，默认值为0，即如果有剩余空间，也不放大</li>
+<li>flex-shrink: 定义项目的缩小比例，默认值为1，即空间不足，该项目将缩小</li>
+<li>flex-basis: 定义了在分配多余空间之前，项目占据的主轴空间，浏览器根据这个属性，计算主轴是否有多余的空间。值: <strong>auto</strong>(即项目本来的大小)</li>
+<li>order: 定义项目在容器中的排列顺序，数值越小，排列越靠前，默认为0</li>
+<li>align-self: 允许单个项目与其他项目不一样的对齐方式。值: <strong>auto</strong>(即继承父元素的align-items属性)、flex-start、flex-end、center、baseline、stretch</li>
+</ul>
+<h4>grid</h4>
+<p>二维布局方式，相对于使用HTML结构实现的table布局, grid布局都是在CSS中完成的</p>
+<p>重要概念:</p>
+<ul>
+<li>grid容器</li>
+<li>grid项目</li>
+<li>行</li>
+<li>列</li>
+<li>单元格</li>
+<li>网络线</li>
+</ul>
+<p>grid容器的属性</p>
+<ul>
+<li>grid-template-columns</li>
+<li>grid-template-rows</li>
+<li>gap(column-gap、row-gap)</li>
+<li>place-items(justify-items、align-items)</li>
+<li>place-content(justify-content、align-content)</li>
+<li>grid-template-areas</li>
+<li>grid-auto-flow</li>
+<li>grid-auto-columns、grid-auto-rows</li>
+</ul>
+<p>grid项目的属性:</p>
+<ul>
+<li>grid-column-start、grid-column-end</li>
+<li>grid-row-start、grid-row-end</li>
+<li>grid-column</li>
+<li>grid-row</li>
+<li>grid-area</li>
+<li>justify-self、align-self</li>
+<li>place-self</li>
+</ul>
 
     </div>
   </div>
