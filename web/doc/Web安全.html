@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link href="../css/prism.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/common.css">
+  <link rel="stylesheet" type="text/css" href="../css/markdown.css">
+  <title>xkazer</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">关于</a></li>
+          <li><a href="../doc/note.html">笔记</a></li>
+          <li><a href="../doc/study.html">学习</a></li>
+          <li><a href="../home.html">导航</a></li>
+        </ul>
+        <div class="title"><a href="../index.html">kazer</a></div>
+      </nav>
+    </header>
+    <div class="markdown">
+      <h4>注入攻击</h4>
+<p>安全设计原则: 数据与代码分离，它可以说是专门为解决注入攻击而生的</p>
+<p>注入攻击的本质，是把用户输入的数据当做代码执行。这里有两个关键条件:</p>
+<ul>
+<li>第一个是用户能够控制输入</li>
+<li>第二个是原本程序要执行的代码，拼接了用户输入的数据</li>
+</ul>
+<p>注入类型:</p>
+<ul>
+<li>SQL注入</li>
+<li>XML注入</li>
+<li>代码注入</li>
+<li>CRLF注入: CRLF常被用做不同语义之间的分隔符。因为通过&quot;注入CRLF字符&quot;，就有可能改变原有的语义</li>
+</ul>
+<p>攻击手段:</p>
+<ul>
+<li>攻击存储过程</li>
+<li>命令执行: 利用&quot;用户自定义函数&quot;的技巧，即UDF(User-Defined Functions)来执行命令。在建立数据库帐户时应该遵循&quot;最小权限原则&quot;，尽量避免给Web应用使用数据库的管理员权限</li>
+<li>编码问题: 要解决编码注入问题，需要统一数据库、操作系统、Web应用所使用的字符集，以避免各层对字符的理解存在差异。统一设置为UTF-8是一个很好的方法</li>
+</ul>
+<p>防御手段:</p>
+<ul>
+<li>防御SQL注入的最佳方式，就是使用预编译语句，绑定变量</li>
+<li>尽量避免在存储过程内使用动态的SQL语句</li>
+<li>检查输入数据的数据类型，在很大程度上可对抗SQL注入</li>
+<li>对抗代码注入、命令注入时，需要禁用eval()、system()等可以执行命令的函数。如果一定要使用这些函数，则需要对用户的输入数据进行处理。</li>
+<li>对抗CRLF的方法非常简单，只需要处理好&quot;\r&quot;、&quot;\n&quot;这两个保留字符即可，尤其是那些使用&quot;换行符&quot;作为分隔符的应用</li>
+</ul>
+<h4>文件上传漏洞</h4>
+<p>文件上传漏洞是指用户上传了一个可执行的脚本文件，并通过此脚本文件获得了执行服务器端命令的能力</p>
+<p>文件上传导致的常见安全问题一般有:</p>
+<ul>
+<li>上传文件是Web脚本语言，服务器的Web容器解释并执行了用户上传的脚本，导致代码执行</li>
+<li>上传文件是Flash的策略文件crossdomain.xml，黑客可以控制Flash在该域下的行为(其他通过类似方式控制策略文件的情况类似)</li>
+<li>上传文件是病毒、木马文件，黑客用以诱骗用户或者管理员下载执行</li>
+<li>上传文件是钓鱼图片或者包含了脚本的图片，在某些版本的浏览器中会被作为脚本执行，被用于钓鱼和欺诈</li>
+</ul>
+<h5>webshell</h5>
+<p>要完成webshell攻击，要满足如下几个条件:</p>
+<ul>
+<li>首先，上传的文件能够被Web容器解释执行。所以文件上传后所在的目录要是Web容器所覆盖到的路径</li>
+<li>其次，用户能够从web上访问这个文件。如果文件上传了，但用户无法通过Web访问，或者无法使得Web容器解释这个脚本，那么也不能称之为漏洞</li>
+<li>最后，用户上传的文件若被安全检查、格式化、图片压缩等功能改变了内容，则也可以导致攻击不成功</li>
+</ul>
+<p>防御手段:</p>
+<ul>
+<li>文件上传的目录设置为不可执行</li>
+<li>判断文件类型</li>
+<li>使用随机数改写文件名和文件路径</li>
+<li>单独设置文件服务器的域名</li>
+</ul>
+<h4>认证与会话管理</h4>
+<p>认证实际上就是一个验证凭证的过程。认证的目的是为了认出用户是谁，而授权的目的是为了决定用户能够做什么</p>
+<h5>1、密码认证</h5>
+<p>密码必须以不可逆的加密算法，或者是单向散列函数算法，加密后存储在数据库中。</p>
+<p>目前黑客们广泛使用的一种破解MD5加密后密码的方法是&quot;彩虹表(Rainbow Table)&quot;</p>
+<p>彩虹表的思路是收集尽可能多的密码明文和明文对应的MD5值。这样只需要查询MD5值，就能找到该MD5值对应的明文。</p>
+<p>通过加盐可以有效对抗彩虹表。在计算密码明文的哈希值时，添加一个&quot;salt&quot;。&quot;salt&quot;是一个字符串，它的作用是为了增加明文的复杂度，并使得彩虹表一类的攻击失效</p>
+<h5>2、多因素认证</h5>
+<p>多因素认证提高了攻击的门槛。比如一个支付交易使用了密码与数字证书双因素认证，成功完成该交易必须满足两个条件: 一是密码正确; 二是进行支持的电脑必须安装了该用户的数字证书。因此，为了成功实施攻击，黑客们除了盗取用户密码外，还不得不想办法在用户电脑上完成支付，这样就大大提高了攻击的成本。</p>
+<h5>3、Session与认证</h5>
+<p>Session劫持是一种通过窃取用户SessionID后，使用该SessionID登录进目标帐户的攻击方法，此时攻击者实际上是使用了目标帐户的有效Session。如果SessionID是保存在Cookie中的，则这种攻击可以称为Cookie劫持。</p>
+<p>Cookie泄露的途径:</p>
+<ul>
+<li>XSS(Cross-Site Scripting跨站脚本)攻击: 通过给Cookie标记HttpOnly(设置HttpOnly标记为true的cookie只能通过服务器端修改，js无法操作[读取会跳过])，可以有效缓解XSS窃取Cookie的问题。</li>
+<li>网络嗅探</li>
+<li>本地木马窃取</li>
+</ul>
+<h5>4、Session Fixation(会话固定)攻击</h5>
+<p>在用户登录网站过程中，如果登录前后用户的SessionID没有发生变化，则会存在Session Fixation问题</p>
+<p>具体攻击的过程是，用户X(攻击者)先获取到一个未经认证的SessionID，然后将这个SessionID交给用户Y去认证，Y完成认证后，服务器并未更新此SessionID的值(注意是未改变SessionID，而不是未改变Session)，所以X可以直接凭借此SessionID登录进Y的帐户</p>
+<p>X如何才能让Y使用这个SessionID呢？如果SessionID保存在Cookie中，比较难做到这一点。但若是SessionID保存在URL中，则X只需要诱使Y打开认证URL即可。</p>
+<p>解决Session Fixation的正确做法是，在登录完成后，重写SessionID。</p>
+<h4>Web框架安全</h4>
+<h5>XSS</h5>
+<p>XSS攻击是在用户的浏览器上执行的，其形成过程则是在服务器端页面渲染时，注入了恶意的HTML代码导致的。从MVC架构来说，是发生在View层，因此使用&quot;输出编码&quot;的防御方法更加合理，这意味着需要针对不同上下文的XSS攻击场景，使用不同的编码方式。</p>
+<p>&quot;输出编码&quot;的防御方法总结为以下几种:</p>
+<ul>
+<li>在HTML标签中输出变量</li>
+<li>在HTML属性中输出变量</li>
+<li>在script标签中输出变量</li>
+<li>在事件中输出变量</li>
+<li>在CSS中输出变量</li>
+<li>在URL中输出变量</li>
+</ul>
+<p>针对以上不同情况，使用不同的编码函数(即对数据进行预处理，过滤关键字符再输出使用)。</p>
+<h5>CSRF(Cross-site request forgery跨站请求伪造)防御</h5>
+<p>在完整的CSRF防御方案，对于Web框架来主有以下几个地方需要改动。</p>
+<ul>
+<li>在Session中绑定token。如果不能保存到服务端Session中，则可以替代为保存到Cookie里</li>
+<li>在from表单中自动填入token字段，比如&lt;input type=hidden name=&quot;anti_csrf_token&quot; value=&quot;$token&quot; /&gt;</li>
+<li>在Ajax请求中自动添加token，这可能需要已有的Ajax封装实现的支持</li>
+<li>在服务端对比POST提交参数的token与Session中绑定的token是否一致，以验证CSRF攻击</li>
+</ul>
+<h5>HTTP Headers管理</h5>
+<ul>
+<li>防御CRLF注入: 对抗CRLF的方案只需要&quot;value&quot;中编码所有的\r\n即可</li>
+<li>Location跳转: 对于框架来主，管理好跳转目的地址是很有必要的。一般来说，可以在两个地方做这件事件:
+<ul>
+<li>如果Web框架提供统一的跳转函数，则可以在跳转函数内部实现一个白名单，指定跳转地址只能在白名单中</li>
+<li>另一种解决方案是控制HTTP的Location字段，限制Location的值只能是哪些地址，本质还是白名单</li>
+</ul>
+</li>
+<li>防御ClickJacking(点击劫持，视觉欺骗引导用户点击): 对抗ClickJacking的X-Frame-Options，需要在页面的HTTP Response中添加。该HTTP头有三个可选值:
+<ul>
+<li>DENY: 拒绝任何域加载。浏览器会拒绝当前页面加载任何frame页面</li>
+<li>SAMEORIGIN: 允许同源域下加载。frame页面的地址只能加载同源下的页面</li>
+<li>ALLOW-FROM: 可以定义允许frame加载的页面地址</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <script src="../js/prism.js"></script>
+</body>
+</html>
