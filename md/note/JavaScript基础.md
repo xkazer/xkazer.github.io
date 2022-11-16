@@ -146,6 +146,30 @@ element.addEventListener(type, function, useCapture);
 - 递归方法: reduce()、reduceRight()
 - 填充方法: fill()
 
+#### for..in和for...of
+for...in遍历的是数据索引(index)，而for...of遍历的是数组的元素值(value)
+> for...in遍历时，index索引为字符串型数字，不能直接进行几何运算
+> for...in会遍历数组所有的可枚举属性，包括原型
+```javascript
+var arr = ['a', 'b', 'c']
+Array.prototype.a = 123
+for(let i in arr) {
+  console(arr[i]);
+}
+// 'a', 'b', 'c', 123
+```
+
+#### require和import
+- 规范
+  - require是AMD规范引入方式
+  - import是ES6的一个语法标准，如果要兼容浏览器的话必须转化为ES5的语法
+- 调用时间
+  - require是运行时调用，所以require理论上可以运用在代码的任何地址
+  - import是编译时调用，所以必须放在文件开头
+- 本质
+  - require是赋值过程。module.exports后面的内容是什么，require的结果就是什么，比如对象、数字、字符串、函数等，然后再把require的结果赋值给某个变量，它相当于module.exports的传送门
+  - import是解构过程，但是目前所有的引擎都还没有实现import，我们在node中使用babel支持ES6，也仅仅是将ES6转码为ES5再执行，import语法会被转码为require
+
 #### GC算法
 标记-清除算法:
 - 标记阶段: 首先通过根节点，标记所有从根节点开始的可达对象。未被标记的对象就是未被引用的垃圾对象
@@ -242,3 +266,31 @@ var handle = window.requestIdleCallback(callback[, options])
 
 > 因为它发生在一帧的最后，此时页面布局已经完成，所以不建议在requestIdleCallback里再操作DOM，这样会导致页面再次重绘。DOM操作建议放在requestAnimationFrame中进行。
 > Promise也不建议在这里进行，因为Promise的回调属性Event loop中优先级较高的一种微任务，会在requestIdleCallback结束时立即执行，不管此时是否还有富余时间，这样很可能会让一帧超过16ms
+
+#### Object.defineProperty
+Object.defineProperty(obj, prop, descriptor) 方法会在一个对象定义一个新属性，或者修改一个对象的现有属性，并返回这个对象
+- obj: 要在其上定义属性的对象
+- prop: 要定义或修改的属性的名称
+- descriptor: 将被定义或修改的属性描述符
+descriptor属性描述符主要有两种形式: 数据描述符和存取描述符。描述符是这两种形式之一; 不能同时是两者。
+- 数据描述符和存取描述符共同拥有:
+  - configurable: 特性表示对象的属性是否可以被删除，以及除value和writable特性外的其他特性是否可以被修改。默认为false
+  - enumerable: 当该属性的enumerable为true时，该属性才可以在for...in循环和Object.keys()中被枚举。默认为false
+- 数据描述符
+  - value: 该属性对应的值。可以是任何有效的JavaScript值(数值、对象、函数等)。默认为undefined
+  - writable: 当且仅当该属性的writable为true时，value才能被赋值运算符改变。默认为false
+- 存取描述符
+  - get: 一个给属性提供getter的方法，如果没有getter则为undefined。当访问该属性时，该方法会被执行，方法执行时没有参数传入，但是会传入this对象(由于继承关系，这里的this并不一定是定义该属性的对象)。默认为undefined.
+  - set: 一个给属性提供setter的方法。如果没有setter则为undefined。当属性值修改时，触发执和该方法。该方法将接受唯一参数，即该属性新的参数值。默认为undefined
+> 定义descriptor时，最好先把这些属性都定义清楚，防止被继承和继承时出错。
+
+#### JS运行机制(Event loop)
+JS执行是单线程的，它是基于事件循环的。
+- 所有同步任务都在主线程上执行，形成一个执行栈
+- 主线程之外，会存在一个任务队列，只要异步任务有了结果，就在任务队列中放置一个事件
+- 当执行栈中的所有同步任务执行完成后，就会读取任务队列。那些对应的异步任务，会结束等待状态，进入执行栈
+- 主线程不断重复上一步
+
+#### Proxy
+> 官方定义: Proxy对象用于定义基本操作的自定义行为(如属性查找、赋值、枚举、函数调用等)
+

@@ -126,3 +126,37 @@ shadow.appendChild(div);
 #### 加载检测方法
 - 通过devtools Network的Time可以查找接口耗时，检测接口耗时是否过长，请求资源是否过多
 - 使用devtools的Performance进行性能分析
+
+#### MVC、MVP、MVVM模式
+- MVC(Model、View、Control): 用户操作View，View发送指令到Control，完成业务逻辑处理，要求Model处理相应的数据，将处理好的数据发送到View展示。用户也可以直接下发指令到Control，完成业务逻辑处理后，要求Model处理数据再给View来展示。
+> Model、View、Control三者相互依赖，修改起来要兼顾其他两者，维护较困难，于是出现了MVP。
+- MVP(Model、View、Presenter): 用户操作View，View发送指令到Presenter，完成业务逻辑后，要求Model处理数据，将处理好的数据返回到Presenter，Presenter将数据发给View来展示
+> View和Model不再相互依赖，使代码耦合降低。但由于Presenter和View相互依赖，Presenter没办法单独做单元测试。所以对View分割一部分叫View接口，Presenter只依赖View接口，增加了复用性。
+> MVP中因为Presenter发送数据到View展示，仍需要大量代码，无法自动更新，于是出现了MVVM。
+- MVVM(Model、View、ViewModel): 用户操作View，ViewModel监听到View的变化，会通知Model中相应的方法进行业务逻辑和数据处理，处理完毕后，ViewModel会监听到自动让View做相应的更新。
+> Vue项目中，new Vue()就是一个ViewModel，View是template模板。Model就是Vue的选项如data、methods等。
+
+#### Web项目架构简介
+- 经典三层架构模式
+  - 表示层(User Interface, UI)
+  - 业务逻辑层(Business Logic Layer, BLL)
+  - 数据访问层(Data Access Layer, DAL)
+- 工厂模式
+  - 定义: 定义一个创建产品对象的工厂接口，将产品对象的实际创建工作推迟到具体子工厂类当中。达到"创建与使用相分离"。
+  - 优点: 工厂类包含必要的逻辑判断，可以决定在什么时候创建哪个产品的实例;客户端无须知道具体产品类型，只需知道参数即可;可引入配置文件，在不修改客户端代码的情况下更换和添加新的具体产品。
+  - 缺点: 简单工厂模式的工厂类单一，负责创建所有产品，职责过重，违背高聚合原则;使用简单工厂模式会增加系统中类的数量(引入新的工厂类);系统扩展困难，一旦增加新产品，就不得不修改工厂逻辑;简单工厂模式使用static工厂方法，造成工厂角色无法形成基于继承的等级结构。
+  - 应用场景:
+    - 简单工厂模式:
+      - 简单工厂(SimpleFactory):  是简单工厂模式的核心，负责创建所有实例的内部逻辑。工厂类的创建产品类的方法可以被外界直接调用，创建所需的产品对象。
+      - 抽象产品(Product): 是简单工厂创建的所有对象的父类，负责描述所有实例共有的公共接口
+      - 具体产品(ConcreteProduct): 是简单工厂模式的创建目标。
+    - 工厂模式:
+      - 抽象工厂(AbstractFactory): 提供创建产品的接口，调用者通过它访问具体工厂的工厂方法newProduct()来创建产品
+      - 具体工厂(ConcreteFactory): 主要是实现抽象工厂中的抽象方法，完成具体产品的创建
+      - 抽象产品(Product): 定义了产品的规范，描述了产品的主要特性和功能
+      - 具体产品(ConcreteProduct): 实现了抽象产品角色定义的接口，由具体工厂创建，与具体工厂一一对应。
+    - 抽象工厂模式:
+      - 抽象工厂(AbstractFactory): 提供了创建产品的接口，包含多个创建产品的方法newProduct(),可以创建多不不同等级的产品
+      - 具体工厂(ConcreteFactory): 主要是实现抽象工厂中的多个抽象方法，完成具体产品的创建
+      - 抽象产品(Product): 定义了产品的规范，描述了产品的主要特性和功能,抽象工厂模式有多个抽象产品。
+      - 具体产品(ConcreteProduct): 实现了抽象产品角色定义的接口，由具体工厂创建，与具体工厂是多对一的关系。
