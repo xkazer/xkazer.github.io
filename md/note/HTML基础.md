@@ -77,3 +77,52 @@ CSS/JavaScript方面
 - 避免使用@import标签
 - 尽量把js放在页面底部或使用defer和async属性
 - 通过对JavaScript和CSS文件进行压缩，来减小文件的体积
+
+#### 自定义组件
+```javascript
+var shadow = this.attachShadow({mode: 'open'});
+var div = document.createElement('div');
+var style = document.createElement('style');
+shadow.appendChild(style);
+shadow.appendChild(div);
+```
+回调:
+- connectedCallback: 当custome element首次被插入文档DOM时，被调用
+- disconnectCallback: 当custom element从文档DOM中删除时，被调用
+- adoptedCallback: 当custom element被移动到新的文档时，被调用
+- attributeChangedCallback: 当custom element增加、删除、修改自身属性时，被调用
+
+#### url
+组成:
+- protocol: 协议
+- hostname: 主机名
+- port: 端口
+- pathname: url路径
+- search: ?号之后的参数
+- hash: #之后台的部分
+加载过程:
+- 输入地址
+- 浏览器查找域名的ip地址
+- 浏览器向web服务器发送一个HTTP请求
+- 服务器的永久定向响应
+- 服务器处理请求
+- 服务器返回一个HTTP响应
+- 浏览器显示HTML
+- 浏览器发送请求获取嵌入在HTML中的资源(图片、音频、视频、CSS、JS等)
+
+#### 移动端显示适配
+在Web中，浏览器为我们提供了window.devicePixelRatio来帮助我们dpr(设备像素比), 单位: px/em/rem
+
+
+#### 页面渲染过程
+- 浏览器通过请求得到一个HTML
+- 渲染进程解析HTML文本，构建DOM树
+- 解析HTML的同时，如果遇到内联样式或样式脚本，则下载并构建样式规则(style rules)，若遇到javascript脚本，则会下载执行脚本
+- DOM树和样式规则构建完成后，渲染进程将两者合并成渲染树(render tree)
+- 渲染进程开始对渲染树进行布局，生成由局树(layout tree)
+- 渲染进程以布局树进行分层，分别栅格化每一层，并得到合成帧
+- 渲染进程将合成帧信息发送给GPU进程显示到页面中
+
+#### 加载检测方法
+- 通过devtools Network的Time可以查找接口耗时，检测接口耗时是否过长，请求资源是否过多
+- 使用devtools的Performance进行性能分析

@@ -43,8 +43,14 @@ var page_500 = function(req, res, error){
 
 http.createServer(function (req, res) {
   let name = req.url.match(/[0-9a-zA-Z.\/]+/)?.input;
+  var realPath;
   if (!name || name === '/') name = '/index.html';
-  var realPath = __dirname +  "/web" + decodeURI(name);
+  try {
+    realPath = __dirname +  "/web" + decodeURI(name);
+  }catch (err) {
+    console.log(`decodeURI: ${name} fail: ${e.toString()}`);
+    realPath = __dirname +  "/web/index.html";
+  }
   fs.access(realPath, fs.constants.R_OK, function(error){
     if(error){
       console.log(new Date().toLocaleString(), req.socket.remoteAddress, req.url, realPath);

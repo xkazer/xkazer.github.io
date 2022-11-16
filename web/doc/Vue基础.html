@@ -26,7 +26,7 @@
     </header>
     <div class="markdown">
       <h4>Vue响应式原理</h4>
-<p>响应式核心是通过Object.defineProperty拦截对数据的访问和设置</p>
+<p>Vue是MVVM(Model-View-ViewModel)架构，响应式核心是通过Object.defineProperty拦截对数据的访问和设置ß</p>
 <p>响应式数据分为两类:</p>
 <ul>
 <li>对象: 循环遍历对象的所有属性，为每个属性设置getter、setter，以达到拦截访问和设置的目的(无法检测property的添加或移除)，如果属性值依旧为对象，则递归为属性值上的每个key设置getter、setter
@@ -84,6 +84,12 @@
 <li>不能向Vue实例或$data动态添加根级别的响应式数组</li>
 <li>Vue.set(obj, key, val),如果obj不是响应式对象，会执行obj[key]=val，但是不会做响应式处理</li>
 <li>Vue.set(obj, key, val),为响应式对象obj增加一个新的key，则通过Object.defineProperty方法设置响应式，并触发依赖更新</li>
+</ul>
+<h4>SPA单页面的实现方式</h4>
+<ul>
+<li>在hash模式中，在window上监听hashchange事件(地址栏中的hash变化触发)驱动界面变化</li>
+<li>在history模式中，在window上监听popstate事件(浏览器的前进或后退按钮的点击触发)驱动页面变化，监听a链接点击事件用history.pushState、history.replaceState方法驱动界面变化</li>
+<li>直接在界面用显示隐藏事件驱动界面变化</li>
 </ul>
 <h4>SPA单页应用的理解</h4>
 <p>SPA(single-page application)仅在Web页面初始化加载相应的HTML、JavaScript和CSS。一旦页面加载完成，SPA不会因为用户的操作而进行页面的重新加载和跳转;取而代之的是利用路由机制实现HTML内容的变换，UI与用户的交互，避免页面的重新加载。</p>
@@ -157,6 +163,37 @@
 </ul>
 </li>
 </ul>
+<h4>Vue中Watch高级用法deep和immediate</h4>
+<p>watch默认绑定，页面首次加载时，是不会执行的。只有值发生改变才会执行。指定immediate为true则可以立即执行。</p>
+<pre><code class="language-javascript">watch: {
+  name: {
+    handler(newVal, oldVal) {
+      // 执行代码
+    },
+    immediate: true       // true表示立即执行
+  }
+}
+</code></pre>
+<p>如果监听的是对象类型，当手动修改对象的某个属性时，发现是无效的。这时就需要deep属性</p>
+<pre><code class="language-javascript">data: {
+  obj: {
+    a: 1
+  }
+},
+watch: {
+  obj: {
+    handler(newVal, oldVal) {
+      // 执行代码
+    },
+    deep: true  // true表示深度监听，这时候就可以监测到a的变化
+  },
+  'obj.a': {        // deep优化，用字符串的方式来取代深度监听(一个个遍历，很学浪费性能)
+    handler(newval, oldVal) {
+
+    }
+  }
+}
+</code></pre>
 
     </div>
   </div>

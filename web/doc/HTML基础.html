@@ -95,6 +95,56 @@ CSS/JavaScript方面</li>
 <li>尽量把js放在页面底部或使用defer和async属性</li>
 <li>通过对JavaScript和CSS文件进行压缩，来减小文件的体积</li>
 </ul>
+<h4>自定义组件</h4>
+<pre><code class="language-javascript">var shadow = this.attachShadow({mode: 'open'});
+var div = document.createElement('div');
+var style = document.createElement('style');
+shadow.appendChild(style);
+shadow.appendChild(div);
+</code></pre>
+<p>回调:</p>
+<ul>
+<li>connectedCallback: 当custome element首次被插入文档DOM时，被调用</li>
+<li>disconnectCallback: 当custom element从文档DOM中删除时，被调用</li>
+<li>adoptedCallback: 当custom element被移动到新的文档时，被调用</li>
+<li>attributeChangedCallback: 当custom element增加、删除、修改自身属性时，被调用</li>
+</ul>
+<h4>url</h4>
+<p>组成:</p>
+<ul>
+<li>protocol: 协议</li>
+<li>hostname: 主机名</li>
+<li>port: 端口</li>
+<li>pathname: url路径</li>
+<li>search: ?号之后的参数</li>
+<li>hash: #之后台的部分
+加载过程:</li>
+<li>输入地址</li>
+<li>浏览器查找域名的ip地址</li>
+<li>浏览器向web服务器发送一个HTTP请求</li>
+<li>服务器的永久定向响应</li>
+<li>服务器处理请求</li>
+<li>服务器返回一个HTTP响应</li>
+<li>浏览器显示HTML</li>
+<li>浏览器发送请求获取嵌入在HTML中的资源(图片、音频、视频、CSS、JS等)</li>
+</ul>
+<h4>移动端显示适配</h4>
+<p>在Web中，浏览器为我们提供了window.devicePixelRatio来帮助我们dpr(设备像素比), 单位: px/em/rem</p>
+<h4>页面渲染过程</h4>
+<ul>
+<li>浏览器通过请求得到一个HTML</li>
+<li>渲染进程解析HTML文本，构建DOM树</li>
+<li>解析HTML的同时，如果遇到内联样式或样式脚本，则下载并构建样式规则(style rules)，若遇到javascript脚本，则会下载执行脚本</li>
+<li>DOM树和样式规则构建完成后，渲染进程将两者合并成渲染树(render tree)</li>
+<li>渲染进程开始对渲染树进行布局，生成由局树(layout tree)</li>
+<li>渲染进程以布局树进行分层，分别栅格化每一层，并得到合成帧</li>
+<li>渲染进程将合成帧信息发送给GPU进程显示到页面中</li>
+</ul>
+<h4>加载检测方法</h4>
+<ul>
+<li>通过devtools Network的Time可以查找接口耗时，检测接口耗时是否过长，请求资源是否过多</li>
+<li>使用devtools的Performance进行性能分析</li>
+</ul>
 
     </div>
   </div>
