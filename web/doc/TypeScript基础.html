@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link href="../css/prism.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/common.css">
+  <link rel="stylesheet" type="text/css" href="../css/markdown.css">
+  <title>xkazer</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">关于</a></li>
+          <li><a href="../doc/note.html">笔记</a></li>
+          <li><a href="../doc/study.html">学习</a></li>
+          <li><a href="../home.html">导航</a></li>
+        </ul>
+        <div class="title"><a href="../index.html">kazer</a></div>
+      </nav>
+    </header>
+    <div class="markdown">
+      <h4>什么是TypeScript</h4>
+<blockquote>
+<p>TypeScript是一个强类型的JavaScript超集，支持ES6语法，支持面向对象编程的概念，如类、接口、继承、泛型等。
+TypeScript并不直接在浏览器上运行，需要编译器编译成纯JavaScript来运行</p>
+</blockquote>
+<h4>TypeScript相对于JavaScript的优势</h4>
+<blockquote>
+<p>增加了静态类型， 可以在开发人员编写脚本时检测错误，使得代码质量更好，更健壮</p>
+</blockquote>
+<ul>
+<li>杜绝手误导致的变量名写错</li>
+<li>类型可以一定程度上充当文档</li>
+<li>IDE自动填充，自动联想</li>
+</ul>
+<h4>const 和 readonly的区别</h4>
+<blockquote>
+<p>const可以防止变量的值被修改，readyonly可以防止变量的属性被修改</p>
+</blockquote>
+<ul>
+<li>const用于变量，readyonly用于属性</li>
+<li>const在运行时检查，readonly在编译时检查</li>
+<li>const 声明的变量不得改变值，这意味着const一旦声明变量就必须立即初始化，不能留到以后赋值。readonly修饰的属性能确保自身不能修改属性，但是当你把这个属性交给其他并没有这种保证的使用者(允许类型兼容性的原因)，他们能改变</li>
+</ul>
+<pre><code class="language-typescript">const foo: {
+  readonly bar: number;
+} = {
+  bar: 123
+};
+function isMutateFoo(foo: { bar: number }) {
+  foo.bar = 456;
+}
+isMutateFoo(foo);
+console.log(foo.bar);   // 456
+</code></pre>
+<ul>
+<li>const保证的不是变量的值不得改变，而是变量指向的那个内存地址不得改动，例如使用const变量的数组，可以使用push、pos等方法。但是如果使用ReadyOnlyArray&lt;number&gt;声明的数组不能使用push,pop方法</li>
+</ul>
+<h4>any、never、unknown、null &amp; undefind 和 void 区别</h4>
+<ul>
+<li>any: 动态的变量类型(失去了类型检查的作用)</li>
+<li>never: 永不存在的值的类型，例如: never类型是那些总是会抛出异常或根本不会有返回值的函数表达式或箭头表达式的返回值类型</li>
+<li>unknown: 任何类型的值都可以赋给unknown类型，但是unknown类型的值只能赋给unknown本身和any类型</li>
+<li>null &amp;&amp; undefined: 默认情况下null和undefined是所有类型的子类型。就是说你可以把null和undefined赋值给number类型的变量。当你指定了 --strictNullChecks标记，null和undefined只能赋值给void和它们各自</li>
+<li>void: 不有任何类型。例如: 一个函数如果没有返回值，那么返回值可以定义为void</li>
+</ul>
+<h4>Typescript中的this和JavaScript中的this有什么差异</h4>
+<ul>
+<li>TypeScript: noImplicitThis: true的情况下，必须去声明this的类型，才能在函数和对象中使用this</li>
+<li>TypeScript中箭头函数的this和ES6中箭头函数中的this是一致的</li>
+</ul>
+<h4>Typescript中使用Union Types时有哪些注意事项</h4>
+<p>属性或方法访问: 当TypeScript不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型里共有的属性或方法。</p>
+<pre><code class="language-typescript">function getString(something: string | number): string {
+  return something.toString();    // 不能访问length
+}
+</code></pre>
+<h4>type和interface的区别</h4>
+<p>相同点:</p>
+<ul>
+<li>都可以描述 对象 或者 函数</li>
+<li>都允许拓展(extends)
+不同点:</li>
+<li>type可以声明基本类型，联合类型，元组</li>
+<li>type可以使用typeof获取实例的类型进行赋值</li>
+<li>多个相同的interface声明可以自动合并</li>
+</ul>
+<blockquote>
+<p>使用interface 描述 数据结构, 使用type描述 类型关系</p>
+</blockquote>
+<pre><code class="language-typescript">enum str { A, B, C}
+type strUnion = keyof typeof str;   // 'A' | 'B' | 'C'
+</code></pre>
+
+    </div>
+  </div>
+  <script src="../js/prism.js"></script>
+</body>
+</html>

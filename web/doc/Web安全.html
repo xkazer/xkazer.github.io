@@ -101,6 +101,12 @@
 <h4>Web框架安全</h4>
 <h5>XSS</h5>
 <p>XSS攻击是在用户的浏览器上执行的，其形成过程则是在服务器端页面渲染时，注入了恶意的HTML代码导致的。从MVC架构来说，是发生在View层，因此使用&quot;输出编码&quot;的防御方法更加合理，这意味着需要针对不同上下文的XSS攻击场景，使用不同的编码方式。</p>
+<p>类型:</p>
+<ul>
+<li>反射型XSS: 通过url(如搜索参数)将脚本由后台透传到页面</li>
+<li>存储型XSS: 通过聊天/博客等将脚本存储到目标服务器</li>
+<li>基于DOM的XSS: 纯前端</li>
+</ul>
 <p>&quot;输出编码&quot;的防御方法总结为以下几种:</p>
 <ul>
 <li>在HTML标签中输出变量</li>
@@ -136,6 +142,78 @@
 </ul>
 </li>
 </ul>
+<h4>内容安全策略(CSP)</h4>
+<p>CSP实质是白名单制度，开发者明确告诉客户端，哪些外部资源可以加载和执行，等同于提供白名单。它的实现和执行全部由浏览器完成。</p>
+<p>两种方式可以启用CSP。一种是通过HTTP头信息的<strong>Content-Security-Policy</strong>字段</p>
+<pre><code class="language-javascript">content-security-policy: script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:
+</code></pre>
+<p>另一种是通过网页的**&lt;meta&gt;**标签</p>
+<pre><code class="language-html">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:&quot;&gt;
+</code></pre>
+<p>上面代码中，CSP做了如下配置：</p>
+<ul>
+<li>脚本: 只信任当前域名</li>
+<li>&lt;object&gt;标签: 不信任任何URL，即不加载任何资源</li>
+<li>样式表: 只信任cdn.example.org和third-party.org</li>
+<li>框架(frame): 必须使用https协议加载</li>
+<li>其他资源: 没有限制
+启用后，不符合CSP的外部资源就会被阻止加载。资源加载限制选项:</li>
+<li>script-src: 外部脚本</li>
+<li>style-src: 样式表</li>
+<li>img-src: 图像</li>
+<li>media-src: 媒体文件(音频和视频)</li>
+<li>font-src: 字体文件</li>
+<li>object-src: 插件(比如Flash)</li>
+<li>child-src: 框架</li>
+<li>frame-ancestors: 嵌入的外部资源(比如&lt;frame&gt;、&lt;iframe&gt;、&lt;embed&gt;和&lt;applet&gt;)</li>
+<li>connect-src: HTTP连接(通过XHR、WebSockets、EventSource等)</li>
+<li>worker-src: worker脚本</li>
+<li>manifest-src: manifest 文件</li>
+<li>default-src: 上面各个选项的默认值
+URL限制:</li>
+<li>frame-ancestors: 限制嵌入框架的网页</li>
+<li>base-uri: 限制&lt;base#href&gt;</li>
+<li>form-action: 限制&lt;form#action&gt;
+其他限制:</li>
+<li>block-all-mixed-content: HTTPS网页不得加载HTTP资源(浏览器已经默认开启)</li>
+<li>upgrade-insecure-requests: 自动将网页上所有加载外部资源的HTTP链接换成HTTPS协议</li>
+<li>plugin-types: 限制可以使用的插件格式</li>
+<li>sandbox: 浏览器行为的限制，比如不能有弹出窗口等
+report-uri:
+用于记录XSS行为。report-uri用来告诉浏览器，应该把注入行为报告给哪个网址</li>
+</ul>
+<pre><code>Content-Security-Policy: default-src 'self'; ...; report-uri /my_csp_report_parser;
+</code></pre>
+<p>选项值:</p>
+<ul>
+<li>主机名: example.org, https://example.com:443</li>
+<li>路径名: example.org/resources.js/</li>
+<li>通配符: <em>.example.org, <em>.//</em>.example.com:</em> (表示任意协议、任意子域名、任意端口)</li>
+<li>协议名: https:、data:</li>
+<li>关键字'self': 当前域名，需要加引号</li>
+<li>关键字'none': 禁止加载任何外部资源，需要加引号</li>
+</ul>
+<blockquote>
+<p>如果同一个限制选项使用多次，只有第一次会生效
+script-src还支持一些特殊值(都需要放在单引号里):</p>
+</blockquote>
+<ul>
+<li>'unsafe-inline': 允许执行页面内嵌的&lt;script&gt;标签和事件监听函数</li>
+<li>'unsafe-eval': 允许将字符串当作代码执行，比如使用eval、setTimeout、setInterval和Function等函数。</li>
+<li>nonce值: 每次HTTP回应给出一个授权token,页面内嵌脚本必须有这个token，才会执行</li>
+<li>hash值: 列出允许执行的脚本代码的Hash值(计算hash值时，&lt;script&gt;标签不算在内)，页面内嵌脚本的哈希值只有吻合的情况下，才能执行
+例:</li>
+</ul>
+<pre><code class="language-javascript">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;script-src 'nonce-EDNnf03nceIOfn39fn3e9h3sdfa'&quot;&gt;
+// 必段有token才能执行
+&lt;script nonce
+</code></pre>
+<p>注意</p>
+<blockquote>
+<p>script-src和object-src是必设的，除非设置了default-src
+script-src不能使用unsafe-inline关键字(除非伴随一个nonce值), 也不能允许设置 data:URL
+必须特别注意JSONP的回调函数</p>
+</blockquote>
 
     </div>
   </div>
