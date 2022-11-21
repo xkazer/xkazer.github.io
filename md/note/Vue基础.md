@@ -1,6 +1,6 @@
 
 #### Vue响应式原理
-Vue是MVVM(Model-View-ViewModel)架构，响应式核心是通过Object.defineProperty拦截对数据的访问和设置ß
+Vue是MVVM(Model-View-ViewModel)架构，响应式核心是通过Object.defineProperty拦截对数据的访问和设置
 
 响应式数据分为两类:
 - 对象: 循环遍历对象的所有属性，为每个属性设置getter、setter，以达到拦截访问和设置的目的(无法检测property的添加或移除)，如果属性值依旧为对象，则递归为属性值上的每个key设置getter、setter

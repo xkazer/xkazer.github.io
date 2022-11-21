@@ -103,6 +103,10 @@ p {
   padding: 0;
 }
 
+img {
+  max-width: 100%;
+}
+
 p::first-letter {
   font-weight: 600;
 }

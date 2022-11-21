@@ -26,7 +26,9 @@
     </header>
     <div class="markdown">
       <h4>内联元素和块级元素</h4>
+<blockquote>
 <p>HTML4中，元素被分成两大类：inline （内联元素）与 block （块级元素）。</p>
+</blockquote>
 <ul>
 <li>格式上，默认情况下，行内元素不会以新行开始，而块级元素会新起一行。</li>
 <li>内容上，默认情况下，行内元素只能包含文本和其他行内元素。而块级元素可以包含行内元素和其他块级元素。</li>
@@ -41,15 +43,19 @@
 <li>小型的移动设备无法完全显示框架。</li>
 </ul>
 <h4>浏览器内核</h4>
+<blockquote>
 <p>主要分成两部分：渲染引擎和 JS 引擎。</p>
 <p>渲染引擎的职责就是渲染，即在浏览器窗口中显示所请求的内容。默认情况下，渲染引擎可以显示 html、xml 文档及图片，它也可以借助插件（一种浏览器扩展）显示其他类型数据，例如使用 PDF 阅读器插件，可以显示 PDF 格式。</p>
 <p>JS 引擎：解析和执行 javascript 来实现网页的动态效果。</p>
 <p>最开始渲染引擎和 JS 引擎并没有区分的很明确，后来 JS 引擎越来越独立，内核就倾向于只指渲染引擎。</p>
+</blockquote>
 <h3>常见浏览器</h3>
+<blockquote>
 <p>Trident：这种浏览器内核是 IE 浏览器用的内核，因为在早期 IE 占有大量的市场份额，所以这种内核比较流行，以前有很多网页也是根据这个内核的标准来编写的，但是实际上这个内核对真正的网页标准支持不是很好。但是由于 IE 的高市场占有率，微软也很长时间没有更新 Trident 内核，就导致了 Trident 内核和 W3C 标准脱节。还有就是 Trident 内核的大量 Bug 等安全问题没有得到解决，加上一些专家学者公开自己认为 IE 浏览器不安全的观点，使很多用户开始转向其他浏览器。</p>
 <p>Gecko：这是 Firefox 和 Flock 所采用的内核，这个内核的优点就是功能强大、丰富，可以支持很多复杂网页效果和浏览器扩展接口，但是代价是也显而易见就是要消耗很多的资源，比如内存。</p>
 <p>Webkit：Webkit 是 Safari 采用的内核，它的优点就是网页浏览速度较快，虽然不及 Presto 但是也胜于 Gecko 和 Trident，缺点是对于网页代码的容错性不高，也就是说对网页代码的兼容性较低，会使一些编写不标准的网页无法正确显示。WebKit 前身是 KDE 小组的 KHTML 引擎，可以说 WebKit 是 KHTML 的一个开源的分支。</p>
-<p>Blink：谷歌在 Chromium Blog 上发表博客，称将与苹果的开源浏览器核心 Webkit 分道扬镳，在 Chromium 项目中研发 Blink 渲染引擎（即浏览器核心），内置于 Chrome 浏览器之中。其实 Blink 引擎就是 Webkit 的一个分支，就像 webkit 是KHTML 的分支一样。Blink 引擎现在是谷歌公司与 Opera Software 共同研发，上面提到过的，Opera 弃用了自己的 Presto 内核，加入 Google 阵营，跟随谷歌一起研发 Blink</p>
+<p>Blink：谷歌在 Chromium Blog 上发表博客，称将与苹果的开源浏览器核心 Webkit 分道扬镳，在 Chromium 项目中研发 Blink 渲染引擎（即浏览器核心），内置于 Chrome 浏览器之中。其实 Blink 引擎就是 Webkit 的一个分支，就像 webkit 是KHTML 的分支一样。Blink 引擎现在是谷歌公司与 Opera &gt;Software 共同研发，上面提到过的，Opera 弃用了自己的 Presto 内核，加入 Google 阵营，跟随谷歌一起研发 Blink</p>
+</blockquote>
 <h3>常见浏览器</h3>
 <ul>
 <li>IE 浏览器内核：Trident 内核，也是俗称的 IE 内核；</li>
@@ -133,13 +139,17 @@ shadow.appendChild(div);
 <h4>页面渲染过程</h4>
 <ul>
 <li>浏览器通过请求得到一个HTML</li>
-<li>渲染进程解析HTML文本，构建DOM树</li>
-<li>解析HTML的同时，如果遇到内联样式或样式脚本，则下载并构建样式规则(style rules)，若遇到javascript脚本，则会下载执行脚本</li>
+<li>渲染进程解析HTML文本(收到一块14k就开始)，构建DOM树</li>
+<li>解析HTML的同时，如果遇到内联样式或样式脚本，则下载并构建样式规则(style rules)(阻塞)，若遇到javascript脚本(没有async或defer)会阻塞，则会下载执行脚本</li>
 <li>DOM树和样式规则构建完成后，渲染进程将两者合并成渲染树(render tree)</li>
-<li>渲染进程开始对渲染树进行布局，生成由局树(layout tree)</li>
+<li>渲染进程开始对渲染树进行布局，生成布局树(layout tree)</li>
 <li>渲染进程以布局树进行分层，分别栅格化每一层，并得到合成帧</li>
 <li>渲染进程将合成帧信息发送给GPU进程显示到页面中</li>
 </ul>
+<blockquote>
+<p>等待获取CSS不会阻塞HTML的解析或下载，但是它会阻塞JavaScript，因为JavaScript经常用于查询元素的CSS属性
+创建图层的属性和元素: &lt;video&gt;、&lt;canvas&gt;、opacity、3D transform、will-change元素等</p>
+</blockquote>
 <h4>加载检测方法</h4>
 <ul>
 <li>通过devtools Network的Time可以查找接口耗时，检测接口耗时是否过长，请求资源是否过多</li>
@@ -209,6 +219,45 @@ MVP中因为Presenter发送数据到View展示，仍需要大量代码，无法�
 </ul>
 </li>
 </ul>
+<h4>监控页面性能</h4>
+<blockquote>
+<p>Performance接口可以获取到当前页面中与性能相关的信息。
+<img src="../png/web_performance.webp" alt=""></p>
+</blockquote>
+<blockquote>
+<p>字段含义</p>
+</blockquote>
+<ul>
+<li><strong>navigationStart</strong>: 同一个浏览器上一个页面卸载结束时的时间戳。如果没有上一个页面，该值与<strong>fetchStart</strong>相同</li>
+<li>redirectStart: 第一个HTTP重定向开始的时间戳，如果没有重定向，或者重定向到一个不同源的话，那么该值返回为0</li>
+<li>redirectEnd: 最后一个HTTP重定向完成时的时间戳。如果没有重定向，或者重定向到一个不同源的话，那么该值返回为0</li>
+<li><strong>fetchStart</strong>: 浏览器准备好使用HTTP请求抓取文档的时间(发生在检查本地缓存之前)</li>
+<li>domainLookupStart: DNS域名查询开始的时间，如果使用了本地缓存或持久链接，该值则与<strong>fetchStart</strong>值相同</li>
+<li>domainLookupEnd: DNS域名查询完成的时间，如果使用了本地缓存或持久链接，该值则与<strong>fetchStart</strong>值相同</li>
+<li>connectStart: HTTP开始建立连接的时间，如果是持久链接的话，该值则和fetchStart值相同，如果在传输层发生了错误且需要重新建立连接的话，那么这里显示的新建立的链接开始时间</li>
+<li>secureConnectionStart: HTTPS连接开始的时间，如果不是安全连接，则值为0</li>
+<li>connectEnd: HTTP完成建立连接的时间(完成握手)。如果是持久链接的话，该值则和fetchStart值相同，如果在传输层发生了错误且需要重新建立链接的话，那么这里显示的是新建立的链接完成时间</li>
+<li>requestStart: HTTP请求读取真实文档开始的时间，包括从本地读取缓存，链接错误重连时。</li>
+<li>responseStart: 开始接收到响应的时间(获取到第一个字节的那个时候)。包括从本地读取缓存</li>
+<li>responseEnd: HTTP响应全部接收完成的时间(获取到最后一个字节)。包括从本地选取缓存</li>
+<li>unloadEventStart: 前一个网页(和当前页面同域)unload的时间戳，如果没有前一个网页或前一个网页是不同域的话，那么该值为0</li>
+<li>unloadEventEnd: 和unloadEventStart相对应，返回是前一个网页unload事件绑定的回调函数执行完毕的时间戳</li>
+<li>domLoading: 开始解析渲染DOM树的时间</li>
+<li><strong>domInteractive</strong>: 完成解析DOM树的时间(只是DOM树解析完成，但是并没有开始加载网页的资源)</li>
+<li>domContentLoadedEventStart: DOM解析完成后，网页内资源加载开始的时间</li>
+<li><strong>domConrentLoadedEventEnd</strong>: DOM解析完成后，网页内资源加载完成的时间</li>
+<li>domComplete: DOM树解析完成，且资源也准备就绪的时间。Document.readyState变为complete，并将抛出readystatechange相关事件</li>
+<li>loadEventStart: load事件发送给文档。也即load回调函数开始执行的时间，如果没有绑定load事件，则该值为0</li>
+<li>loadEventEnd: laod事件的回调函数执行完毕的时间，如果没有绑定load事件，该值为0</li>
+</ul>
+<blockquote>
+<p>Performance.timing属性</p>
+</blockquote>
+<p><img src="../png/web_timing.webp" alt=""></p>
+<blockquote>
+<p>白屏时间: <strong>domInteractive</strong>-<strong>fetchStart</strong></p>
+<p>首屏时间: <strong>domContentLoadedEventEnd</strong>-<strong>fetchStart</strong></p>
+</blockquote>
 
     </div>
   </div>
