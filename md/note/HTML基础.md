@@ -122,6 +122,7 @@ shadow.appendChild(div);
 - 渲染进程开始对渲染树进行布局，生成布局树(layout tree)
 - 渲染进程以布局树进行分层，分别栅格化每一层，并得到合成帧
 - 渲染进程将合成帧信息发送给GPU进程显示到页面中
+
 > 等待获取CSS不会阻塞HTML的解析或下载，但是它会阻塞JavaScript，因为JavaScript经常用于查询元素的CSS属性
 > 创建图层的属性和元素: <video>、<canvas>、opacity、3D transform、will-change元素等
 
