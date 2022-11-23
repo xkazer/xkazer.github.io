@@ -294,6 +294,173 @@ JS执行是单线程的，它是基于事件循环的。
 - 当执行栈中的所有同步任务执行完成后，就会读取任务队列。那些对应的异步任务，会结束等待状态，进入执行栈
 - 主线程不断重复上一步
 
+#### 模块化--JS规范
+##### CommonJS
+> NodeJS是CommonJS规范的主要实践者，它有四个重要的环境变量为模块化的实现提供支持: module、exports、require、global。实际使用时，用module.exports定义当前模块对外输出的接口(不推荐使用exports)，用require加载模块。
+```javascript
+/** 
+ * 导出
+ */
+var basicNum = 0;
+function add(a, b) {return a+b};
+mmodule.exports = {
+  add: add,
+  basicNum: basicNum
+}
+/**
+ * 引用 
+ */
+// 必须加./路径，不加的话只会去node_modules文件找
+var math = =require('./math');
+```
+> CommonJS用同步的方式加载模块。在服务端，模块文件都存在本地，读取快，所以不会有问题。但是在浏览器上，限于网络原因，更合理的方案是使用异步加载
+>
+> exports 和 module.export区别:
+> - exports： 对于本身来讲是一个变量(对象), 它不是module的引用，它是{}的引用，它指向module.exports的{}模块。只能使用.语法向外暴露变量
+> - module.exports: module是一个变量，指向一块内存，exports是module中的一个属性，存储在内存中，然后exports属性指向{}模块。既可以使用.语法，也可以使用=直接赋值
+```javascript
+// 下面的function是一块新的内存地址，导致exports和module.exports不存在任何关系，而require拿到的是module.exports对象，所以这样写是导不出去的
+exports = function (x){console.log(x)};
+
+// 下面的写法是可以导出去的。module.exports除了可以导出对象、函数，还可以导出字符串、数值等
+module.exports = function(x) {console.log(x)};
+```
+
+##### AMD和require.js
+> AMD规范采用异步方式加载，模块的加载不影响它后面语句的运行。所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会执行。这里介绍require.js实现AMD规范的模块化: 用require.config()指定引用路径等，用define()定义模块，用require()加载模块。
+> 
+> 首先我们需要引入require.js文件和一个入口文件main.js。main.js中配置require.config()并规定项目中用到的基础模块。
+```html
+<!-- 网页中引入require.js及main.js -->
+<script src="js/require.js" data-main="js/main"></script>
+```
+```javascript
+/** main.js入口文件/主模块 */
+// 首先用config()指定各模块路径和引用名
+require.config({
+  baseUrl: "js/lib",
+  paths: {
+    "jquery": "jquery.min",   // 实际路径为js/lib/jquery.min.js
+    "underscore": "underscore.min",
+  }
+});
+
+// 执行基本操作
+require(["jquery", "underscore"], function($, _){
+})
+```
+引用模块的时候，我们把模块块名放在[]中作为require()的第一个参数;如果我们定义的模块本身也依赖其他模块，那就需要将它们放在[]中作为define()的第一参数。
+```javascript
+// 定义math.js模块
+define(function() {
+  var basicNum = 0;
+  var add = function (x, y) {return x+y};
+  return {
+    add: add,
+    basicNum: basicNum
+  }
+});
+// 定义一个依赖undefscore.js的模块
+define(['underscore'], function(_){
+  var classify = function(list) {
+    _.countBy(list, function(num){
+      return num > 30 ? 'old' : 'young';
+    })
+  };
+  return {
+    classify: classify
+  };
+})
+// 引用模块，将模块放在[]内
+require(['jquery', 'math'], function($, math){
+  var sum = math.add(10, 20);
+  $("#sum").html(sum);
+});
+```
+##### CMD和sea.js
+> AMD的实现者require.js在申明依赖的模块时，会在第一时间加载并执行模块内的代码:
+```javascript
+define(["a", "b", "c", "d", "e", "f"], function(a, b, c, d, e, f){
+  // 等于在最前面声明并初始化要用到的所有模块
+  if (false) {
+    // 即使没用到某个模块b，但b还是提前执行了。这就是CMD要优化的地方
+    b.foo();
+  }
+})
+```
+> CMD是另一种js模块化方案，它与AMD很类似，不同点在于 **AMD推崇依赖前置、提前执行，CMD推崇依赖就近、延迟执行**。此规范其实是在sea.js推广过程中产生的。
+```javascript
+/** AMD写法 */
+define(["a", "b", "c", "d", "e", "f"], function (a, b, c, d, e, f) {
+  // 等于在最前面声明并初始化了要用到的所有模块
+  a.doSomething();
+  if (false) {
+    // 即便没用到某个模块b，但b还是执行了
+    b.doSomething()
+  }
+});
+
+/** CMD写法 */
+define(function(require, exports, module){
+  var a = require('./a');   // 在需要时声明
+  a.doSomething();
+  if (false) {
+    var b=require('./b');
+    b.doSomething();
+  }
+});
+
+/** sea.js */
+// 定义模块math.js
+define(function(require, exports, module) {
+  var $ = require('jquery.js');
+  var add = function(a, b) {
+    return a+b;
+  }
+  exports.add = add;
+});
+
+// 加载模块
+seajs.use(['math.js'], function(math){
+  var sum = sum.add(1, 2);
+});
+```
+
+##### ESM(ES6 Module)
+> ES6在语言标准的层面上，实现了模块功能，而且实现得相当简单，旨在成为浏览器和服务器通用的模块解决方案。其模块功能主要由两个命令构成: export和import。export命令用于规定模块的对外接口，import命令用于输入其他模块提供的功能。
+```javascript
+/** 定义模块 math.js */
+var basicNum = 0;
+var add = function (a, b){
+  return a+b;
+};
+export { basicNum, add };
+
+/** 引用模块 */
+import { basicNum, add } from './math';
+function test(ele) {
+  ele.textContent = add(99, basicNum);
+}
+```
+> 如上例所示，使用import命令时，用户需要知道所要加载的变量名或函数名。其实ES6还提供了export default命令，为模块指定默认输出，对应的import语句不需要使用大括号。
+```javascript
+/** export default */
+// 定义输出
+export default { basicNum, add };
+
+// 引入
+import math from './math';
+function test(ele) {
+  ele.textContent = math.add(99, math.basicNum);
+}
+```
+> ES6的模块不是对象，import命令会被JavaScript引擎静态分析，在编译时就引入模块代码，而不是在代码运行时加载，所以无法实现条件加载。正因为这个，使得静态分析成为可能。
+> ES6模块的特征:
+> - 严格模式: ES6的模块自动采用严格模式
+> - import read-only特性: import 的属性是只读的，不能赋值，类似于const的特性
+> - export/import提升: import/export必须位于模块顶级，不能位于作用域内; 其次对于模块内的import/export会提升到模块顶部，这是编译阶段完成的。
+
+
 #### Proxy
 > 官方定义: Proxy对象用于定义基本操作的自定义行为(如属性查找、赋值、枚举、函数调用等)
 
