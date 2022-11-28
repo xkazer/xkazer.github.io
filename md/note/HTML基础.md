@@ -111,7 +111,11 @@ shadow.appendChild(div);
 - 浏览器发送请求获取嵌入在HTML中的资源(图片、音频、视频、CSS、JS等)
 
 #### 移动端显示适配
-在Web中，浏览器为我们提供了window.devicePixelRatio来帮助我们dpr(设备像素比), 单位: px/em/rem
+> 在Web中，浏览器为我们提供了window.devicePixelRatio来帮助我们dpr(设备像素比), 单位: px/em/rem
+>   - px： 像素，相对屏幕分辨率而言
+>   - em: 相对于自身字体fontSize的大小，如果自身指定fonstSize=20px，那1em=20px
+>   - rem: 相对于根元素<html>fontSize的大小，如果<html>的fontSize=20px，那么rem=20px
+>   - vw/vh: 相当于屏幕宽度/高度的百分比
 
 
 #### 页面渲染过程
@@ -198,3 +202,48 @@ shadow.appendChild(div);
 > 白屏时间: **domInteractive**-**fetchStart**
 >
 > 首屏时间: **domContentLoadedEventEnd**-**fetchStart**
+
+#### 浏览器缓存
+> 浏览器缓存(Brower Caching)是浏览器对之前请求过的文件进行缓存，以便下一次访问时重复使用，节省带宽，提高访问速度，降低服务器压力
+>
+> http缓存机制主要在http响应头中设定，响应头中相关字段为Expires、Cache-Control、Last-Modified、Etag
+>
+> 浏览器缓存分为强缓存和协商缓存:
+>  - 强缓存: 浏览器不会向服务器发送任何请求，直接从本地缓存中读取文件并返回Status Code: 200 OK
+>  - 协商缓存: 向服务器发送请求，服务器会根据这个请求中的request header的一些参数来判断是否命中协商缓存，如果命中，则返回304状态码并带上新的response header通知浏览器从缓存中读取资源。
+
+##### 强缓存参数
+>  - Expires: 过期时间，如果设置了时间，则浏览器会在设置的时间内直接读取缓存，不再请求
+>  - Cache-Control: 
+>      1. max-age: 用来设置资源可以被缓存多长时间，单位为秒。
+>      2. s-maxage: 和max-age是一样的，不过它中针对代理服务器缓存而言
+>      3. **public**: 指示响应可被任何缓存区缓存
+>      4. **private**: 只能针对个人用户，而不能被代理服务器缓存
+>      5. no-cache: 强制客户端直接向服务器发送请求，也就是说每次请求都必须向服务器发送(评估缓存的有效性)。服务器收到请求后判断资源是否变更，是则返回新内容，否则返回304
+>      6. no-store: 禁止一切缓存
+
+##### 协商缓存参数
+>  1. Etag/If-None-Match
+>      - Etag: 由服务器生成返回给前端，用来帮助服务器控制Web端的缓存验证。(Apache中默认是对文件的索引节(INode)，大小(Size)和最后修改时间(MTime)进行Hash后得到的)
+>      - If-None-Match: 当资源过期时，浏览器发给服务器请求会带上头if-none-match(值是Etag值)。服务器收到请求进行比对，决定返回200或304
+>  2. Last-Modified/If-Modified-Since
+>      - Last-Modified: 浏览器向服务器发送资源最后的修改时间
+>      - If-Modified-Since: 当资源过期时(max-age)，浏览器发给服务器的请求会带上头if-modified-since，表示请求时间。服务器收到会与资源最后修改时间(Last-Modified)对比，有修改则返回最新资源，否则返回304
+> - Last-Modified/If-Modified-Since的时间精底是秒，而Etag可以更精确
+> - Etag优先级是高于Last-Modified的，所以服务器会优化验证Etag
+> - Last-Modified/If-Modified-Since是http1.0的头字段
+
+#### 重定向
+1. **301** Moved Permanently(永久移动): 被请求资源已永久移动到新位置
+2. **302** Found(发现): 要求客户端执行临时重定向(原始描述语为"Moved Temporarily")。由于这样的重定向是临时的，客户端应该继续向原有地址发送以后请求。
+3. 303 See Other(查看其他): 允许重定向时改变请求方法
+4. 307 Temporary Redirect(临时重定向): 与302类似，但不允许更改HTTP方法(Get、Post)
+5. 308 Permanent Redirect(永久重定向): 与301类似，但不允许更改HTTP方法
+> 301和302本来在规范中是不允许重定向时改变请求方式的(将POST改为GET)，但是浏览器却允许重定向时改变请求方法。所以出了303允许重定向时改变请求方法，以及307、308不允许重定向时改变请求方法。
+> 网址劫持(URL Hijacking): 从网址A做一个302重定向到网址B时，搜索引擎(尤其是Google)可会显示网址A，而内容为网址B，这样相当于网址A白嫖了网址B的内容。
+
+#### 跨域请求携带Cookie
+> 1. 前端请求设置request对象的属性withCredentials为true
+>     - XMLHttpRequest.withCredentials属性是一个boolean类型，它指示了是否该使用类似cookies，authorization，headers(头部授权)或TLS客户端证书这一类资格证书来创建一个跨站点访问控制
+> 2. 在服务端设置Access-Control-Allow-Origin
+> 3. 在服务端设置Access-Control-Allow-Credentials

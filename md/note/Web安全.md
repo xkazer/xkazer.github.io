@@ -181,3 +181,18 @@ script-src还支持一些特殊值(都需要放在单引号里):
 > script-src和object-src是必设的，除非设置了default-src
 > script-src不能使用unsafe-inline关键字(除非伴随一个nonce值), 也不能允许设置 data:URL
 > 必须特别注意JSONP的回调函数
+
+
+#### Cookie安全
+> 有两种方法可以确保Cookie被安全发送
+>   1. Secure属性: 标记为Secure的Cookie只应通过被HTTPS协议(http无法使用)加密过的请求发送给服务端。防中间人
+>   2. HttpOnly属性: JavaScript Document.cookie API无法访问带有HttpOnly属性的Cookie;此类Cookie仅作用于有服务器。缓解XSS
+
+
+#### X-Frame-Options
+> X-Frame-Options HTTP响应头是用来给浏览器指示允许一个页面可否在<frame>、<iframe>、<embed>和<object>中展现的标记。站点可以通过确保网站没有被嵌入到别人的站点里面，从页避免点击劫持攻击。
+>
+> X-Frame-Options 有两个可能的值:
+>   - X-Frame-Options: DENY   不光在别人的网站frame嵌入时会无法加载，在同域名页面中同样无法加载
+>   - X-Frame-Options: SAMEORIGIN   可在相同域名页面的frame中展示。
+> 使用<meta>标签设置X-Frame-Options是无效的，需要通过HTTP头X-Frame-Options才会生效

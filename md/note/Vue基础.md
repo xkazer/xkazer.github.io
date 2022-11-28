@@ -203,9 +203,9 @@ directives: {
   - 视图改变时通知数据更新: 通过监听表单元素的input事件，从而通知数据更新
 - 自定义组件
 ```html
-<v-input v-model="val"></v-input>
+<input v-model="val">
 <!-- 等价于 -->
-<v-input :value="val" @input="val = $event"></v-input>
+<input v-bind:value="val" v-on:input="val=$event.target.value">
 ```
 
 #### v-for和v-if不建议同时使用

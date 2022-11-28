@@ -349,7 +349,7 @@ require.config({
 require(["jquery", "underscore"], function($, _){
 })
 ```
-引用模块的时候，我们把模块块名放在[]中作为require()的第一个参数;如果我们定义的模块本身也依赖其他模块，那就需要将它们放在[]中作为define()的第一参数。
+> 引用模块的时候，我们把模块块名放在[]中作为require()的第一个参数;如果我们定义的模块本身也依赖其他模块，那就需要将它们放在[]中作为define()的第一参数。
 ```javascript
 // 定义math.js模块
 define(function() {
@@ -456,10 +456,74 @@ function test(ele) {
 ```
 > ES6的模块不是对象，import命令会被JavaScript引擎静态分析，在编译时就引入模块代码，而不是在代码运行时加载，所以无法实现条件加载。正因为这个，使得静态分析成为可能。
 > ES6模块的特征:
-> - 严格模式: ES6的模块自动采用严格模式
-> - import read-only特性: import 的属性是只读的，不能赋值，类似于const的特性
-> - export/import提升: import/export必须位于模块顶级，不能位于作用域内; 其次对于模块内的import/export会提升到模块顶部，这是编译阶段完成的。
+>    - 严格模式: ES6的模块自动采用严格模式
+>    - import read-only特性: import 的属性是只读的，不能赋值，类似于const的特性
+>    - export/import提升: import/export必须位于模块顶级，不能位于作用域内; 其次对于模块内的import/export会提升到模块顶部，这是编译阶段完成的。
 
+##### ES6模块与CommonJS模块的差异
+> 1. CommonJS模块输出的是一个值的拷贝，ES6模块输出的是值的引用
+>     - CommonJS输出的是值的拷贝，也就是说，一旦输出一个值，模块内部的变化就影响不到这个值
+>     - ES6模块的运行机制与CommonJS不一样。JS引擎对脚本静态分析时，遇到模块加载命令import，就会生成一个只读引用。等到脚本真正执行时，再根据这个只读引用，到被加载的那个模块里面去取值。换句话说，ES6的import有点像Unix系统的"符号连接"，原始值变了，import加载的值也会跟着变。
+> 2. CommonJS模块是运行时加载，ES6模块是编译时输出接口
+>     - 运行时加载: CommonJS模块就是对象; 即在输入时是先加载整个模块，生成一个对象，然后再从这个对象上面读取方法，这种加载称为"运行时加载"。
+>     - 编译时加载: ES6模块不是对象，而是通过export命令显式指定输出的代码，import时采用静态命令的形式。即在import时可以指定加载某个输出值，而不是加载整个模块，这种加载称为"编译时加载"。模块内部引用的变化，会反应在外部。
+> CommonJS输出拷贝的例子
+```javascript
+// a.js
+let a = 1;
+let b = { num: 1}
+setTimeout(() => {
+  a = 2;
+  b = { num: 2 };
+}, 200);
+module.exports = {
+  a,
+  b,
+};
+
+// main.js
+let { a, b } = require('./a');
+console.log(a);     // 1
+console.log(b);     // { num: 1 }
+setTimeout(() => {
+  console.log(a);     // 1
+  console.log(b);     // { num: 1 }
+}, 500);
+```
+> ES6 Module输出的例子:
+```javascript
+// a.js
+let a = 1;
+let b = { num: 1}
+setTimeout(() => {
+  a = 2;
+  b = { num: 2 };
+}, 200);
+module.exports = {
+  a,
+  b,
+};
+
+// main.js
+import {a, b} from './a';
+console.log(a);     // 1
+console.log(b);     // { num: 1 }
+setTimeout(() => {
+  console.log(a);     // 2
+  console.log(b);     // { num: 2 }
+}, 500);
+```
+##### 总结
+1. AMD/CMD/CommonJS是js模块化的规范，对应的实现是require.js/sea.js/Node.js
+2. CommonJS主要针对服务端(一般采用同步加载)，AMD/CMD/ES Module主要针对浏览器端(一般采用异步加载)，容易混淆的是AMD/CMD。
+3. AMD/CMD区别，虽然都是并行加载js文件，但还是有所区别，AMD是预加载，在并行加载js文件同时，还会解析执行该模块;而CMD是懒加载，虽然一开始会并行加载js文件，但是不会执行，而是在需要时才执行。
+4. AMD/CMD的优缺点，一个的优点就是另一个的缺点，可以对照浏览。
+    - AMD优点: 加载快速，尤其遇到多个大文件，因为并行解析，所以同一时间可以解析多个文件
+    - AMD缺点: 并行加载，异步处理，加载顺序不一定，可能会造成一些困扰，甚至为程序埋下大坑
+    - CMD优化: 因为只有在使用的时候才会解析执行js文件，因此，每个JS文件的执行顺序在代码中是有体现的，是可控的。
+    - CMD缺点: 执行等待时间会叠加。因为每个文件执行时是同步执行(串行执行)，因此时间是所有文件解析执行时间之和，尤其在文件较多较大时，这个缺点尤为明显(AMD可以利用空闲时间)。
+5. CommonJS和ES Module区别: CommonJS模块输出的是一个值的拷贝，ES6模块输出的是值的引用
+6. 使用: CommonJS是node就行，AMD是通过<script>引入require.js，CMD则是引入sea.js
 
 #### Proxy
 > 官方定义: Proxy对象用于定义基本操作的自定义行为(如属性查找、赋值、枚举、函数调用等)
