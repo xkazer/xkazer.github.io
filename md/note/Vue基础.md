@@ -225,3 +225,18 @@ Vue3中proxy:
 - 深度监听是在获取值的时候才对其监听(按需监听)
 - 可以很完备的监听属性增加和删除
 - 数组可以原生使用api，不需要再对需要监听的api再做处理
+
+
+#### Vue2响应式实现
+```javascript
+Object.defineProperty(obj, prop, {
+  get() {
+    return value;
+  },
+  set(newValue){
+    if (newValue === value) return;
+    value = newValue;
+    update();
+  }
+})
+```

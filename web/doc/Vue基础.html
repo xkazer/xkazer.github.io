@@ -289,6 +289,18 @@ Vue3中proxy:</li>
 <li>可以很完备的监听属性增加和删除</li>
 <li>数组可以原生使用api，不需要再对需要监听的api再做处理</li>
 </ul>
+<h4>Vue2响应式实现</h4>
+<pre><code class="language-javascript">Object.defineProperty(obj, prop, {
+  get() {
+    return value;
+  },
+  set(newValue){
+    if (newValue === value) return;
+    value = newValue;
+    update();
+  }
+})
+</code></pre>
 
     </div>
   </div>

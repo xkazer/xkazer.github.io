@@ -55,7 +55,7 @@ parseInt('123a'); // 123
 - {} 的valueOf结果是{}，toString的结果是"[object Object]"
 - [] 的valueOf结果是[]，toString的结果是""
 
-#### || 和 && 操作符的返回值
+#### || 和 && 操作符的返回值  
 || 和 && 首先会对第一个操作数执行条件判断:
 - || 如果第一个条件判断为true则返回第一个操作数的值，如果为false，则返回第二个操作数的值
 - && 如果第一个条件判断为true则返回第二个操作数的值，如果为false， 则返回第一个操作数的值
@@ -524,6 +524,22 @@ setTimeout(() => {
     - CMD缺点: 执行等待时间会叠加。因为每个文件执行时是同步执行(串行执行)，因此时间是所有文件解析执行时间之和，尤其在文件较多较大时，这个缺点尤为明显(AMD可以利用空闲时间)。
 5. CommonJS和ES Module区别: CommonJS模块输出的是一个值的拷贝，ES6模块输出的是值的引用
 6. 使用: CommonJS是node就行，AMD是通过<script>引入require.js，CMD则是引入sea.js
+
+
+#### 函数柯里化实现
+```javascript
+function curry(func) {
+  return function curried(...args) {
+    if (args.length >= func.length) {
+      return func.apply(this, args);
+    } else {
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2));
+      }
+    }
+  }
+}
+```
 
 #### Proxy
 > 官方定义: Proxy对象用于定义基本操作的自定义行为(如属性查找、赋值、枚举、函数调用等)

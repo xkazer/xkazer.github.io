@@ -247,3 +247,22 @@ shadow.appendChild(div);
 >     - XMLHttpRequest.withCredentials属性是一个boolean类型，它指示了是否该使用类似cookies，authorization，headers(头部授权)或TLS客户端证书这一类资格证书来创建一个跨站点访问控制
 > 2. 在服务端设置Access-Control-Allow-Origin
 > 3. 在服务端设置Access-Control-Allow-Credentials
+
+#### HTTP2.0和HTTP1.x相比的新特性
+> - 新的二进制格式(Binary Format), HTTP1.x的解析是基于文本，HTTP2.0的协议解析采用的是二进制格式。
+> - 多路复用(MultiPlexing)，连接共享，即每一个request都是用作连接共享机制的。一个request对应用一个id，这样一个链接上可以有多个request。
+> - header压缩, HTTP2.0使用encoder来减少需要传输的header大小，通讯双方各cache一份header fields表，即避免了重复header的传输，又减小了需要传输的大小
+> - 服务端推送(server push)，HTTP2.0也具有server push功能
+
+#### OPTIONS请求
+> 预检请求，主要作用:
+> 1. 检测服务器支持的请求方法
+> 2. CORS中的预检请求
+> 预检响应头response header的关键字段
+
+response header|作用
+--|--
+Access-Control-Allow-Methods|返回了服务端允许的请求，包含GET/HEAD/PUT/PATCH/POST/DELETE
+Access-Control-Allow-Credentials|允许跨域携带cookie(跨域请求要携带cookie必须设置为true)
+Access-Control-Allow-Origin|允许跨域请求的域名，这个可以在服务端配置一些信任的域名白名单
+Access-Control-Request-Headers|客户端请求所携带的自定义首部字段content-type

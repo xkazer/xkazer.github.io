@@ -165,3 +165,166 @@ grid项目的属性:
 - grid-area
 - justify-self、align-self
 - place-self
+
+#### 实现响应式布局
+> 响应式设计的基本原理是通过媒体查询检测不同的设备屏幕尺寸做处理，为了处理移动端，页面头部必须有meta声明viewport。
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user=scalable=no">
+```
+> 属性对应如下:
+>  - width=device-width: 是自适应手机屏幕的尺寸宽度
+>  - maximum-scale: 是缩放比例的最大值
+>  - initial-scale: 是缩放的初始化
+>  - user-scalable: 是用户的可以缩放的操作
+
+属性名|取值|描述
+--|--|--
+width|正整数|定义布局视口的宽度，单位为像素
+height|正整数|定义布局视口的高度，单位为像素，很少使用
+initial-scale|[0,10]|初始缩放比例，1表示不缩放
+minimum-scale|[0,10]|最小缩放比例
+maxinum-scale|[0,10]|最大缩放比例
+user-scalable|yes/no|是否允许手动缩放页面，默认值为yes
+
+##### 媒体查询
+> 使用@media查询，可以针对不同的媒体类型定义不同的样式
+```css
+@media screen (min-width: 375px) and (max-width: 600px) { ... }
+```
+
+##### 百分比
+> 通过百分比单位"%"来实现响应式的效果。height、width属性的百分比依托于父标签的宽高，但是其他盒子属性则不完全依赖父元素:
+>   - 子元素的top/left和bottom/right如果设置百分比，则相对于直接非static定位(默认定位)的父元素的高度/宽度
+>   - 子元素的padding如果设置百分比，不论是垂直方向还是水平方向，都相对于直接父元素的width
+>   - 子元素的margin如果设置成百分比，不论是垂直方向还是水平方向，都相对于直接父元素的width
+>   - border-radius不一样，如果设置border-radius为百分比，则是相对于自身的宽度
+
+##### vw/vh
+> vw表示相对于视图窗口的宽度，vh表示相对于视图窗口高蔗。任意层级元素，在使用vw单位的情况下，1vw都等于视图宽度的百分之一，与百分比布局很类似。
+
+##### rem
+> rem是一个灵活的、可扩展的单位，由浏览器转化像素并显示。rem是相对于根元素html的font-size属性，默认情况下浏览器字体大小为16px，此时1rem=16px。可以利用前面提到的媒体查询，针对不同设备分辨率改变font-size的值。
+```css
+@media screen and (max-width: 320px) {
+  html {
+    font-size: 12px;
+  }
+}
+```
+
+#### BFC
+> BFC(Block Formatting Context)，即块级格式化上下文，它是页面中的一块渲染区域，并且有一套属于自己的渲染规则:
+>  - 内部的盒子会在垂直方向上一个接一个的放置
+>  - 对于同一个BFC的俩个相邻的盒子的margin会发生重叠，与方向无关
+>  - 每个元素的左外边距与包含块的左边界相接触(从左到右)，即使是浮动元素也是如此
+>  - BFC的区域不会与float的元素区域重叠
+>  - 计算BFC的高度时，浮动子元素也参与计算
+>  - BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素，反之亦然
+
+##### BFC触发条件
+> 触发BFC的条件包括不限于:
+>  - 根元素，即HTML元素
+>  - 浮动元素: float值为left、right
+>  - overflow值不为visble，为auto、scroll、hidden
+>  - display的值为inline-block、inltable-cell、table-caption、table、inline-table、flex、inline-flex、grid、inline-grid
+>  - position的值为absolute或fixed
+
+##### BFC应用场景
+
+###### 防止margin重叠(塌陷)
+```html
+<style>
+  p {
+    width: 200px;
+    line-height: 100px;
+    text-align: center;
+    margin: 100px;
+  }
+</style>
+<body>
+  <p>Haha</p>
+  <p>Hehe</p>
+</body>
+```
+> 两个p元素之间的距离为100px，发生了margin重叠(塌陷)，以最大的为准。可以在p外层包裹一层容器，并触发这个容器生成一个BFC,两个p不属于同一个BFC，就不会出现margin重叠
+```html
+<style>
+  .wrap {
+    overflow: hidden;     // 新的BFC
+  }
+  p {
+    width: 200px;
+    line-height: 100px;
+    text-align: center;
+    margin: 100px;
+  }
+</style>
+<body>
+  <p>Haha</p>
+  <div class="wrap">
+    <p>Hehe</p>
+  </div>
+</body>
+```
+
+###### 清除内部浮动
+```html
+<style>
+  .par {
+    border: 5px solid #fcc;
+    width: 300px;
+  }
+  .child {
+    border: 5px solid #f66;
+    width: 100px;
+    height: 100px;
+    float: left;
+  }
+</style>
+<body>
+  <div class="par">
+    <div class="child"></div>
+    <div class="child"></div>
+  </div>
+</body>
+```
+> 这里.par的高度为0，因为子元素是浮动的。这里可以利用BFC计算高度时，浮动元素也会参与的规则，让.par元素生成一个BFC，则内部浮动元素计算高度时也会计算。
+```css
+.par {
+  overflow: hidden;
+}
+```
+
+###### 自适应多栏布局
+> 这里举个两栏的布局
+```html
+<style>
+    body {
+        width: 300px;
+        position: relative;
+    }
+ 
+    .aside {
+        width: 100px;
+        height: 150px;
+        float: left;
+        background: #f66;
+    }
+ 
+    .main {
+        height: 200px;
+        background: #fcc;
+    }
+</style>
+<body>
+    <div class="aside"></div>
+    <div class="main"></div>
+</body>
+```
+> 因为每个元素的左外边距与包含块的左边界相接触，因为虽然.aslide为浮动元素，但是main的左边依然与包含块的左边相接触。而BFC的区域不会与浮动盒子重叠，所以我们可通过触发main生成BFC，以此适应两栏布局
+```css
+.main {
+  overflow: hidden;
+}
+```
+> 新的BFC不会与浮动的.aside元素重叠。因此会根据包含块的宽度，和.aside的宽度，自动变窄。

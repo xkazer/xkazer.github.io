@@ -588,6 +588,19 @@ setTimeout(() =&gt; {
 <li>CommonJS和ES Module区别: CommonJS模块输出的是一个值的拷贝，ES6模块输出的是值的引用</li>
 <li>使用: CommonJS是node就行，AMD是通过&lt;script&gt;引入require.js，CMD则是引入sea.js</li>
 </ol>
+<h4>函数柯里化实现</h4>
+<pre><code class="language-javascript">function curry(func) {
+  return function curried(...args) {
+    if (args.length &gt;= func.length) {
+      return func.apply(this, args);
+    } else {
+      return function (...args2) {
+        return curried.apply(this, args.concat(args2));
+      }
+    }
+  }
+}
+</code></pre>
 <h4>Proxy</h4>
 <blockquote>
 <p>官方定义: Proxy对象用于定义基本操作的自定义行为(如属性查找、赋值、枚举、函数调用等)</p>

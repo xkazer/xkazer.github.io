@@ -199,6 +199,215 @@
 <li>justify-self、align-self</li>
 <li>place-self</li>
 </ul>
+<h4>实现响应式布局</h4>
+<blockquote>
+<p>响应式设计的基本原理是通过媒体查询检测不同的设备屏幕尺寸做处理，为了处理移动端，页面头部必须有meta声明viewport。</p>
+</blockquote>
+<pre><code class="language-html">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, user=scalable=no&quot;&gt;
+</code></pre>
+<blockquote>
+<p>属性对应如下:</p>
+<ul>
+<li>width=device-width: 是自适应手机屏幕的尺寸宽度</li>
+<li>maximum-scale: 是缩放比例的最大值</li>
+<li>initial-scale: 是缩放的初始化</li>
+<li>user-scalable: 是用户的可以缩放的操作</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>属性名</th>
+<th>取值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>width</td>
+<td>正整数</td>
+<td>定义布局视口的宽度，单位为像素</td>
+</tr>
+<tr>
+<td>height</td>
+<td>正整数</td>
+<td>定义布局视口的高度，单位为像素，很少使用</td>
+</tr>
+<tr>
+<td>initial-scale</td>
+<td>[0,10]</td>
+<td>初始缩放比例，1表示不缩放</td>
+</tr>
+<tr>
+<td>minimum-scale</td>
+<td>[0,10]</td>
+<td>最小缩放比例</td>
+</tr>
+<tr>
+<td>maxinum-scale</td>
+<td>[0,10]</td>
+<td>最大缩放比例</td>
+</tr>
+<tr>
+<td>user-scalable</td>
+<td>yes/no</td>
+<td>是否允许手动缩放页面，默认值为yes</td>
+</tr>
+</tbody>
+</table>
+<h5>媒体查询</h5>
+<blockquote>
+<p>使用@media查询，可以针对不同的媒体类型定义不同的样式</p>
+</blockquote>
+<pre><code class="language-css">@media screen (min-width: 375px) and (max-width: 600px) { ... }
+</code></pre>
+<h5>百分比</h5>
+<blockquote>
+<p>通过百分比单位&quot;%&quot;来实现响应式的效果。height、width属性的百分比依托于父标签的宽高，但是其他盒子属性则不完全依赖父元素:</p>
+<ul>
+<li>子元素的top/left和bottom/right如果设置百分比，则相对于直接非static定位(默认定位)的父元素的高度/宽度</li>
+<li>子元素的padding如果设置百分比，不论是垂直方向还是水平方向，都相对于直接父元素的width</li>
+<li>子元素的margin如果设置成百分比，不论是垂直方向还是水平方向，都相对于直接父元素的width</li>
+<li>border-radius不一样，如果设置border-radius为百分比，则是相对于自身的宽度</li>
+</ul>
+</blockquote>
+<h5>vw/vh</h5>
+<blockquote>
+<p>vw表示相对于视图窗口的宽度，vh表示相对于视图窗口高蔗。任意层级元素，在使用vw单位的情况下，1vw都等于视图宽度的百分之一，与百分比布局很类似。</p>
+</blockquote>
+<h5>rem</h5>
+<blockquote>
+<p>rem是一个灵活的、可扩展的单位，由浏览器转化像素并显示。rem是相对于根元素html的font-size属性，默认情况下浏览器字体大小为16px，此时1rem=16px。可以利用前面提到的媒体查询，针对不同设备分辨率改变font-size的值。</p>
+</blockquote>
+<pre><code class="language-css">@media screen and (max-width: 320px) {
+  html {
+    font-size: 12px;
+  }
+}
+</code></pre>
+<h4>BFC</h4>
+<blockquote>
+<p>BFC(Block Formatting Context)，即块级格式化上下文，它是页面中的一块渲染区域，并且有一套属于自己的渲染规则:</p>
+<ul>
+<li>内部的盒子会在垂直方向上一个接一个的放置</li>
+<li>对于同一个BFC的俩个相邻的盒子的margin会发生重叠，与方向无关</li>
+<li>每个元素的左外边距与包含块的左边界相接触(从左到右)，即使是浮动元素也是如此</li>
+<li>BFC的区域不会与float的元素区域重叠</li>
+<li>计算BFC的高度时，浮动子元素也参与计算</li>
+<li>BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素，反之亦然</li>
+</ul>
+</blockquote>
+<h5>BFC触发条件</h5>
+<blockquote>
+<p>触发BFC的条件包括不限于:</p>
+<ul>
+<li>根元素，即HTML元素</li>
+<li>浮动元素: float值为left、right</li>
+<li>overflow值不为visble，为auto、scroll、hidden</li>
+<li>display的值为inline-block、inltable-cell、table-caption、table、inline-table、flex、inline-flex、grid、inline-grid</li>
+<li>position的值为absolute或fixed</li>
+</ul>
+</blockquote>
+<h5>BFC应用场景</h5>
+<h6>防止margin重叠(塌陷)</h6>
+<pre><code class="language-html">&lt;style&gt;
+  p {
+    width: 200px;
+    line-height: 100px;
+    text-align: center;
+    margin: 100px;
+  }
+&lt;/style&gt;
+&lt;body&gt;
+  &lt;p&gt;Haha&lt;/p&gt;
+  &lt;p&gt;Hehe&lt;/p&gt;
+&lt;/body&gt;
+</code></pre>
+<blockquote>
+<p>两个p元素之间的距离为100px，发生了margin重叠(塌陷)，以最大的为准。可以在p外层包裹一层容器，并触发这个容器生成一个BFC,两个p不属于同一个BFC，就不会出现margin重叠</p>
+</blockquote>
+<pre><code class="language-html">&lt;style&gt;
+  .wrap {
+    overflow: hidden;     // 新的BFC
+  }
+  p {
+    width: 200px;
+    line-height: 100px;
+    text-align: center;
+    margin: 100px;
+  }
+&lt;/style&gt;
+&lt;body&gt;
+  &lt;p&gt;Haha&lt;/p&gt;
+  &lt;div class=&quot;wrap&quot;&gt;
+    &lt;p&gt;Hehe&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</code></pre>
+<h6>清除内部浮动</h6>
+<pre><code class="language-html">&lt;style&gt;
+  .par {
+    border: 5px solid #fcc;
+    width: 300px;
+  }
+  .child {
+    border: 5px solid #f66;
+    width: 100px;
+    height: 100px;
+    float: left;
+  }
+&lt;/style&gt;
+&lt;body&gt;
+  &lt;div class=&quot;par&quot;&gt;
+    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;child&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</code></pre>
+<blockquote>
+<p>这里.par的高度为0，因为子元素是浮动的。这里可以利用BFC计算高度时，浮动元素也会参与的规则，让.par元素生成一个BFC，则内部浮动元素计算高度时也会计算。</p>
+</blockquote>
+<pre><code class="language-css">.par {
+  overflow: hidden;
+}
+</code></pre>
+<h6>自适应多栏布局</h6>
+<blockquote>
+<p>这里举个两栏的布局</p>
+</blockquote>
+<pre><code class="language-html">&lt;style&gt;
+    body {
+        width: 300px;
+        position: relative;
+    }
+ 
+    .aside {
+        width: 100px;
+        height: 150px;
+        float: left;
+        background: #f66;
+    }
+ 
+    .main {
+        height: 200px;
+        background: #fcc;
+    }
+&lt;/style&gt;
+&lt;body&gt;
+    &lt;div class=&quot;aside&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;main&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+</code></pre>
+<blockquote>
+<p>因为每个元素的左外边距与包含块的左边界相接触，因为虽然.aslide为浮动元素，但是main的左边依然与包含块的左边相接触。而BFC的区域不会与浮动盒子重叠，所以我们可通过触发main生成BFC，以此适应两栏布局</p>
+</blockquote>
+<pre><code class="language-css">.main {
+  overflow: hidden;
+}
+</code></pre>
+<blockquote>
+<p>新的BFC不会与浮动的.aside元素重叠。因此会根据包含块的宽度，和.aside的宽度，自动变窄。</p>
+</blockquote>
 
     </div>
   </div>
