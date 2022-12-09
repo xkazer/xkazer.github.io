@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link href="../css/prism.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/common.css">
+  <link rel="stylesheet" type="text/css" href="../css/markdown.css">
+  <title>xkazer</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">关于</a></li>
+          <li><a href="../doc/note.html">笔记</a></li>
+          <li><a href="../doc/study.html">学习</a></li>
+          <li><a href="../home.html">导航</a></li>
+        </ul>
+        <div class="title"><a href="../index.html">kazer</a></div>
+      </nav>
+    </header>
+    <div class="markdown">
+      <h4>设计原则</h4>
+<blockquote>
+<ol>
+<li>开闭原则:  对扩展开放，对修改关闭。</li>
+<li>单一职责原则: 模块只做一件事，模块的职责越单一越好。</li>
+<li>依赖倒置原则: 上层模块不要依赖与具体的下层模块，应该依赖于抽象。</li>
+<li>接口隔离原则: 接口要细化，功能要单一，一个接口不要调用太多方法，使其功能单一。单一职责原则主要关注于模块本身，接口隔离原则关注于接口。我们要尽量细化接口，每个接口做的事情尽情单一化。</li>
+<li>迪米特法则: 我们让2个对象之前产生沟通，我们最好让2个对象之间知道的越少越好。中介者模式就是一个很好体现迪米特法则的设计模式。</li>
+<li>里氏替换原则: 关注于继承，意义是任何使用父类的地方都可以用子类去替换，直白的说我们子类继承父类的时候，我们子类必须完全保证继承父类的属性和方法，这样的话父类使用的地方，子类可以进行替换。</li>
+</ol>
+</blockquote>
+<h4>设计模式的分类</h4>
+<blockquote>
+<ol>
+<li>创建型
+<ul>
+<li>工厂模式: 大量创建对象</li>
+<li>单例模式: 全局只能有我一个</li>
+<li>建造者模式: 精细化组合对象</li>
+<li>原型模式: JavaScript的灵魂</li>
+</ul>
+</li>
+<li>结构型
+<ul>
+<li>外观模式: 给你一个套餐</li>
+<li>适配器模式: 用适配代替更改</li>
+<li>装饰者模式: 更优雅地扩展需求</li>
+<li>享元模式:  共享来减少数量</li>
+<li>桥接模式:  独立出来，然后再对接回去</li>
+</ul>
+</li>
+<li>行为型
+<ul>
+<li>观察者模式: 我作为第三方转发</li>
+<li>状态模式: 用状态代替判断</li>
+<li>策略模式: 算法工厂</li>
+<li>职责链模式: 像生产线一样组织模块</li>
+<li>命令模式: 用命令去解耦</li>
+<li>迭代器模式: 告别for循环</li>
+</ul>
+</li>
+<li>技巧型
+<ul>
+<li>链模式: 链式调用</li>
+<li>委托模式: 让别人代替你收快递</li>
+<li>数据访问模式: 一个方便的数据管理器</li>
+<li>惰性模式: 我要搞机器学习(第一次执行完后把状态记录下来)</li>
+<li>等待者模式: 等你们都回来再吃饭</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<h4>封装对象</h4>
+<blockquote>
+<ol>
+<li>封装目的
+<ul>
+<li>定义的变量不会污染到外部</li>
+<li>能够作为一个模块调用</li>
+<li>遵循开闭原则</li>
+</ul>
+</li>
+<li>好的封装:
+<ul>
+<li>变量外部不可见</li>
+<li>调用接口使用</li>
+<li>留出扩展接口</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<h5>封装对象时的设计模式</h5>
+<blockquote>
+<ul>
+<li>创建一个对象的模式
+<ol>
+<li>工厂模式:  方便大量创建对象; 当某一个对象需要经常创建时</li>
+<li>建造者模式: 需要组合出一个全局对象; 当要创建单个、庞大的组合对象时</li>
+</ol>
+</li>
+<li>保障对象全局只有一个
+<ol>
+<li>单例模式: 需要确保全局只有一个对象; 为了避免重复新建，避免多个对象存在相互干扰
+工厂模式: 如果你写的模块，需要大量创建类似的对象
+建造者模式: 需要创建一个需要大量参数，且内部模块庞大
+单例模式: 防止重复注册，防止有多个对象互相干扰</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<h4>提高复用性</h4>
+<blockquote>
+<ol>
+<li>好的复用:
+<ul>
+<li>对象可以再重复使用，不用修改</li>
+<li>重复代码少</li>
+<li>模块功能单一</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<h5>提高复用性的设计模式</h5>
+<blockquote>
+<ul>
+<li>减少代码数量，高效利用代码
+<ol>
+<li>桥接模式: 通过桥接代替耦合; 减少模块之间的耦合</li>
+<li>享元模式: 减少对象/代码数量; 当代码中创建了大量类似对象和类似的代码块</li>
+</ol>
+</li>
+<li>创建高可复用性的代码
+<ol>
+<li>模版方法模式: 定义一系列操作的骨架，简化后面类似操作的内容; 当项目中出现很多类似操作内容</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<h4>提高可扩展性</h4>
+<blockquote>
+<ol>
+<li>提高可扩展性的目的
+<ul>
+<li>面对需求变更，方便更改该需求</li>
+<li>减少代码修改的难度</li>
+</ul>
+</li>
+<li>好的扩展
+<ul>
+<li>需求的变更，不需要重写</li>
+<li>代码修改不会引起大规模变动</li>
+<li>方便加入新模块</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<h5>提高可扩展性的设计模式</h5>
+<blockquote>
+<ul>
+<li>更好的更改代码
+<ol>
+<li>适配器模式(接口): 通过写一个适配器，来代替替换; 面临接口不通用的问题</li>
+<li>装饰者模式(方法作用): 不重写方法的扩展方法; 放一个方法需要扩展，但是又不好去修改方法</li>
+</ol>
+</li>
+<li>解耦你的方法与调用
+<ol>
+<li>命令模式: 解耦实现和调用，让双方互不干扰; 调用的命令充满不确定性</li>
+</ol>
+</li>
+<li>应对需求上的变更
+<ol>
+<li>观察者模式: 减少对象间的耦合，来提高可扩展性; 当两个模块直接沟通会增加它们的耦合性时</li>
+<li>职责链模式: 为了避免请求发送者与多个请求处理者耦合在一起，形成一个链条; 把操作分隔成一系列模块，每个模块只处理自己的事情</li>
+<li>访问者模式: 解耦数据结构与数据操作; 数据结构不希望与操作有关联</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<h4>提高代码质量</h4>
+<blockquote>
+<ol>
+<li>提高代码质量的目的:
+<ul>
+<li>高质量的代码，方便后续的一切操作</li>
+<li>方便他人阅读</li>
+</ul>
+</li>
+<li>什么是代码质量
+<ul>
+<li>代码整洁</li>
+<li>结构规整，没有漫长的结构</li>
+<li>阅读好理解</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<h5>优化代码结构</h5>
+<blockquote>
+<ol>
+<li>策略模式/状态模式: 优化if-else分支; 当代码if-else分支过多时</li>
+<li>外观模式: 通过为多个复杂的子系统提供一个一致的接口; 当完成一个操作时，需要操作多个子系统，不如提供一个更高级的</li>
+</ol>
+</blockquote>
+<h5>优化代码操作</h5>
+<blockquote>
+<ol>
+<li>迭代器模式: 不访问内部的情况下，方便的遍历数据; 当我们需要对某个对象进行操作，但是又不能暴露内部</li>
+<li>备忘录模式: 记录状态，方便回滚; 系统状态多样，为了保证状态的回滚方便，记录状态</li>
+</ol>
+</blockquote>
+
+    </div>
+  </div>
+  <script src="../js/prism.js"></script>
+</body>
+</html>

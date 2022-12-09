@@ -541,6 +541,37 @@ function curry(func) {
 }
 ```
 
-#### Proxy
-> 官方定义: Proxy对象用于定义基本操作的自定义行为(如属性查找、赋值、枚举、函数调用等)
+#### javascript单线程
+> 浏览器是一个多进程的架构
 
+![](../png/singlethread.png)
+
+> 渲染进程下的多线程
+
+![](../png/multithreading.png)
+
+> - **GUI线程**: 负责渲染页面，解析html、css; 构建DOM树和渲染树
+> - **js引擎线程**: js引擎线程负责解析和执行js程序; js引擎线程与GUI线程互斥，当浏览器执行javascript程序时，GUI渲染线程层会保存在一个队列当中，直到js程序执行完成，才会接着执行。
+> - **定时触发线程**: setTimeout是由定时器触发线程完成的，定时器触发线程在这定时任务完成后会通知事件触发线程往任务队列里添加事件。
+> - **事件触发线程**: 将满足触发条件的事件放入任务队列，一些异步的事件会放到异步队列中
+> - **异步HTTP请求线程**: 用与处理ajax请求，当请求完成时如果有回调函数就通知事件触发线程往任务队列中添加任务
+
+
+#### 浏览器的Event Loop
+##### 宏任务和微任务
+
+![](../png/taskandmicrotask.png)
+
+> - 宏任务
+>     1. script: script整体代码
+>     2. setImmediate: node的一个方法
+>     3. setTimeout和setInterval
+>     4. requestAnimationFrame
+>     5. I/O
+>     6. UI rendering
+> - 微任务
+>     1. Object.observe: 监听对象变化的一个方法
+>     2. MutationObserver: 可以监听Dom结构变化的一个api
+>     3. postMessage: window对象通信的一个方法
+>     4. Promise.then catch finally
+![](../png/eventloopfn.png)

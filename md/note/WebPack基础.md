@@ -124,7 +124,7 @@ mainFields: ['jsnext:main', 'browser', 'main']
 // 编译代码的基础配置
 module.exports = {
   // ...
-  module: {
+  module: 
     // 项目中使用的jquery并没有采用模块化标准，webpack忽略它
     noParse: /jquery/,
     rules: [
