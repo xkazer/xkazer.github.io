@@ -645,6 +645,23 @@ setTimeout(() =&gt; {
 </li>
 </ul>
 </blockquote>
+<h4>静态方法调用</h4>
+<blockquote>
+<ol>
+<li>通过类名来调用</li>
+<li>通过this.contructor来调用</li>
+</ol>
+</blockquote>
+<pre><code>class StaticMethodCall {
+  constructor() {
+    console.log(StaticMethodCall.staticMethod());
+    console.log(this.constructor.staticMethod());
+  }
+  static staticMethod() {
+    return 'static method has been called.';
+  }
+}
+</code></pre>
 
     </div>
   </div>

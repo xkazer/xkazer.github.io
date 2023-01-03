@@ -575,3 +575,18 @@ function curry(func) {
 >     3. postMessage: window对象通信的一个方法
 >     4. Promise.then catch finally
 ![](../png/eventloopfn.png)
+
+#### 静态方法调用
+> 1. 通过类名来调用
+> 2. 通过this.contructor来调用
+```
+class StaticMethodCall {
+  constructor() {
+    console.log(StaticMethodCall.staticMethod());
+    console.log(this.constructor.staticMethod());
+  }
+  static staticMethod() {
+    return 'static method has been called.';
+  }
+}
+```
