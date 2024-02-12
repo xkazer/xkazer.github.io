@@ -1,0 +1,142 @@
+<html>
+	<head>
+		<title>絮嫣</title>
+	</head>
+	<style>
+body {
+	color: #FFCCCC;
+	background-image: url(img/sky_1.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.baidu {
+	position: relative;
+	margin: 10px;
+	display: flex;
+	flex-direction: row;
+	width: 600px;
+	justify-content: center;
+}
+.bd_logo {
+	width: 103px;
+	height: 33px;
+}
+.bd_search {
+	margin-left: 10px;
+	width: 391px;
+	height: 38px;
+	border: 2px solid #999;
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+	outline: none;
+}
+.bd_search:focus {
+	border: 2px solid #66CCCC;
+}
+.btn_baidu {
+	display: flex;
+	color: #FFFFFF;
+	width: 112px;
+	background-color: #555;
+	justify-content: center;
+	align-items: center;
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+	user-select: none;
+}
+.btn_close {
+	position: absolute;
+    right: 118px;
+    top: 2px;
+}
+.poem {
+	margin-top: 120px;
+	position: relative;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-size: 45px;
+}
+.poem_title {
+	font-size: 60px;
+}
+.poem_author {
+	font-size: 25px;
+}
+.qing {
+	width: 180px;
+    height: 240px;
+    background-size: cover;
+    background-image: url(img/qing.webp);
+}
+.castle {
+	position: absolute;
+	top: 60px;
+	width: 128px;
+	height: 128px;
+	background-size: cover;
+	background-image: url(img/castle.png);
+}
+.links a {
+	color: #FFFFFF;
+    text-decoration-line: none;
+}
+	</style>
+	<body>
+		<div class="content">
+			<div class="baidu">
+				<img class="bd_logo" src="https://www.baidu.com/img/flexible/logo/pc/result.png"></img>
+				<input id="search_input" class="bd_search"></input>
+				<div class="btn_close" onclick="onClear()">
+					<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="32" height="32" viewBox="0 0 24 24" stroke-width="1" stroke="#aaa" fill="none" stroke-linecap="round" stroke-linejoin="round">
+						<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+						<path d="M18 6l-12 12" />
+						<path d="M6 6l12 12" />
+					</svg>
+				</div>
+				<div class="btn_baidu" onclick="onClick()">百度一下</div>
+			</div>
+			<div class="poem">
+				<div class="poem_title">夏日绝句</div>
+				<div class="poem_author">宋-李清照</div>
+				<div class="pome_line">生当作人杰，死亦为鬼雄。</div>
+				<div class="pome_line">至今思项羽，不肯过江东。</div>
+			</div>
+			<div class="castle"></div>
+			<div class="qing"></div>
+			<div class="links">
+				<a href="https://baike.baidu.com/item/%E6%9D%8E%E6%B8%85%E7%85%A7/6351?fr=ge_ala" target="_blank">李清照</a>
+			</div>
+		</div>
+		<script>
+function onClick() {
+	const input = document.getElementById("search_input").value;
+	window.open("https://www.baidu.com/s?wd=" + encodeURI(input));
+}
+
+function onClear() {
+	document.getElementById("search_input").value = "";
+}
+
+window.onload = ()=>{
+	document.getElementById("search_input").addEventListener("keypress", e => {
+		if (e.keyCode == 13) {
+			onClick();
+		} else if (e.keyCode == 32) {
+			for (let i=1; i<=5; i++) {
+				console.log(i + " 你干嘛!");
+			}
+		}
+	})
+}
+
+		</script>
+	</body>
+</html>
