@@ -48,7 +48,7 @@ http.createServer(function (req, res) {
   try {
     realPath = __dirname +  "/web" + decodeURI(name);
   }catch (err) {
-    console.log(`decodeURI: ${name} fail: ${e.toString()}`);
+    console.log(`decodeURI: ${name} fail: ${err.toString()}`);
     realPath = __dirname +  "/web/index.html";
   }
   fs.access(realPath, fs.constants.R_OK, function(error){
