@@ -1,5 +1,6 @@
-var http = require('http');
-var fs = require('fs');
+const http = require('http');
+const fs = require('fs');
+const url = require('url');
 
 var mimetype = {
   'txt': 'text/plain',
@@ -42,19 +43,53 @@ var page_500 = function(req, res, error){
 
 
 http.createServer(function (req, res) {
-  let name = req.url.match(/[0-9a-zA-Z.\/]+/)?.input;
+  const parsedUrl = url.parse(req.url, true);
+  let pathname = parsedUrl.pathname;
+  const query = parsedUrl.query;
+
+  // 处理 OAuth 回调
+  if (req.method === 'GET' && pathname === '/callback') {
+    console.log('Received OAuth callback:', query);
+
+    // 验证必填参数
+    if (!query.code) {
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.end('Error: Missing code parameter');
+      return;
+    }
+
+    // TODO: 在此处用 code 换取 Token（需实现）
+    // 示例：向 OAuth 服务端发送 POST 请求
+    /*
+    const tokenResponse = await fetch(TOKEN_URL, {
+      method: 'POST',
+      body: new URLSearchParams({
+        code: query.code,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        redirect_uri: 'http://xkazer.com/callback',
+        grant_type: 'authorization_code'
+      })
+    });
+    */
+
+    // 返回成功响应
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(`code: ${query.code} Authorization successful! You can close this page.`);
+    return;
+  }
   var realPath;
-  if (!name || name === '/') name = '/index.html';
+  if (!pathname || pathname === '/') pathname = '/index.html';
   try {
-    realPath = __dirname +  "/web" + decodeURI(name);
+    realPath = __dirname +  "/web" + decodeURI(pathname);
   }catch (err) {
-    console.log(`decodeURI: ${name} fail: ${err.toString()}`);
+    console.log(`decodeURI: ${pathname} fail: ${err.toString()}`);
     realPath = __dirname +  "/web/index.html";
   }
   fs.access(realPath, fs.constants.R_OK, function(error){
     if(error){
       console.log(new Date().toLocaleString(), req.socket.remoteAddress, req.url, realPath);
-      return page_404(req, res, name);
+      return page_404(req, res, pathname);
     } else {
       var file = fs.createReadStream(realPath);
       res.writeHead(200, {
