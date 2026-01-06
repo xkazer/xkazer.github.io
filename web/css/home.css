@@ -87,3 +87,7 @@ ul.link li {
   background-size: 1.5em 1.5em;
   bac
 }
+
+button.category {
+    color: #90caf9;
+}

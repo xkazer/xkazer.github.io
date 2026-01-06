@@ -1,37 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" type="text/css" href="css/skeleton.css">
-  <link rel="stylesheet" type="text/css" href="css/common.css">
-  <link rel="stylesheet" type="text/css" href="css/home.css">
-  <title>Home</title>
-  <style>
-    body{
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <script src="js/home.js"></script>
-  <div class="main">
-    <!-- 搜索 -->
-    <div id="searchForm" class="search-form">
-      <select id="searchType" class="search-type" onchange="onSearchTypeChange()">
-        <option value="bing">bing</option>
-        <option value="baidu">Baidu</option>
-        <option value="google">Google</option>
-      </select>
-      <input type="text" lang="zh-CN" id="searchText" autocomplete="off" class="search-text" autofocus="autofocus"
-        onkeydown="event.keyCode==13 && onSearch()">
-      <input type="button" value=" " onclick="onSearch()" class="search-btn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="css/skeleton.css" />
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" href="css/home.css" />
+    <title>Home</title>
+    <style>
+      body {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="js/home.js"></script>
+    <script src="js/rain.js"></script>
+    <canvas id="ad"></canvas>
+    <div class="app">
+      <div class="main">
+        <!-- 搜索 -->
+        <div id="searchForm" class="search-form">
+          <select id="searchType" class="search-type" onchange="onSearchTypeChange()">
+            <option value="bing">bing</option>
+            <option value="baidu">Baidu</option>
+            <option value="google">Google</option>
+          </select>
+          <input
+            type="text"
+            lang="zh-CN"
+            id="searchText"
+            autocomplete="off"
+            class="search-text"
+            autofocus="autofocus"
+            onkeydown="event.keyCode==13 && onSearch()"
+          />
+          <input type="button" value=" " onclick="onSearch()" class="search-btn" />
+        </div>
+        <!-- 导航 -->
+        <ul class="categorys">
+          <!--%LINKS%-->
+        </ul>
+      </div>
     </div>
-    <!-- 导航 -->
-    <ul class="categorys">
-      <!--%LINKS%-->
-    </ul>
-  </div>
-</body>
+  </body>
 </html>
