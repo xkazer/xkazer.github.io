@@ -45,25 +45,6 @@ header nav img.header {
   z-index: 5;
 }
 
-/** 视频播放器 */
-.video-container {
-  position: absolute;
-  left: 0;
-  top: 2.5em;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  z-index: 4;
-  overflow: hidden;
-}
-
-#logo-video {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-}
-
 /** Markdown列表样式 */
 div.markdown {
   position: absolute;
