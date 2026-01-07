@@ -8,6 +8,7 @@ body {
   height: 100%;
   justify-content: center;
   /*background-image: url('../png/bg.png');*/
+  overflow: hidden; /* 防止整个页面滚动 */
 }
 
 canvas {
@@ -20,7 +21,7 @@ canvas {
 .app {
   width: 80vw;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.15); /* 非常浅的半透明白 */
+  background: rgba(0, 0, 0, 0.15); /* 改为深色半透明背景，避免白屏闪烁 */
   backdrop-filter: blur(20px); /* 毛玻璃效果 */
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);

@@ -7,12 +7,19 @@ a:hover {
   text-decoration: overline;
 }
 
-/** 标题菜单样式 */
+/** 标题菜单样式 - 科技感优化 */
 header {
   height: 10em;
   background-position-y: 10em;
-  background-image: linear-gradient(to bottom, #fff 25%, #000 20%, #77f, #aaf, #fff);
+  background-image: 
+    linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.8) 30%, #1a237e 60%, #311b92 80%, #4a148c 100%),
+    radial-gradient(circle at 50% 20%, rgba(0,255,255,0.3) 0%, transparent 50%);
   border-radius: 0 0 9em 0;
+  box-shadow: 
+    0 4px 20px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 header nav ul {
@@ -24,15 +31,27 @@ header nav ul {
 header nav ul li {
   float: right;
   margin: 0;
-  margin-right: 1em;
+  margin-right: 1.5em;
   z-index: 10;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(0,255,255,0.3);
+  transition: all 0.3s ease;
+}
+
+header nav ul li:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: #0ff;
+  box-shadow: 0 0 15px rgba(0,255,255,0.5);
 }
 
 header nav ul li a, header nav ul li a:hover {
-  color: #000;
+  color: #fff;
   font-size: 1em;
   font-weight: 600;
   line-height: 2.5em;
+  padding: 0 1em;
+  text-shadow: 0 0 5px rgba(0,255,255,0.8);
 }
 
 header nav ul li:nth-child(odd){
@@ -40,36 +59,54 @@ header nav ul li:nth-child(odd){
 }
 
 header nav ul li:nth-child(odd) a{
-  color: #fff;
+  color: #0ff;
+  text-shadow: 0 0 8px rgba(0,255,255,1);
 }
 
-/** 主页标题 */
+/** 主页标题 - 科技感优化 */
 header nav div.title {
   position: absolute;
   top: 1.25em;
   left: 1.25em;
-  padding-left: 1em;
+  padding-left: 1.5em;
   color: #fff;
   font-size: 3em;
-  text-shadow: 2px 2px 2px black;
+  font-weight: 700;
+  text-shadow: 
+    0 0 10px #0ff,
+    0 0 20px #0ff,
+    2px 2px 4px rgba(0,0,0,0.8);
   background-image: url(../png/logo.png);
-  background-size: 1em;
+  background-size: 1.2em;
   background-repeat: no-repeat;
-  background-position: left 70%;
+  background-position: left center;
   z-index: 10;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  0% { text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 2px 2px 4px rgba(0,0,0,0.8); }
+  100% { text-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 2px 2px 6px rgba(0,0,0,0.8); }
 }
 
 header nav div.title a, header nav div.title a:hover, header nav div.title a:active {
   color: #fff;
   text-decoration: none;
+  transition: text-shadow 0.3s ease;
+}
+
+header nav div.title a:hover {
+  text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 3px 3px 8px rgba(0,0,0,0.8);
 }
 
 /** Markdown列表样式 */
 div.markdown {
   width: 100%;
-  background-color: #fff;
+  height: 100%;
   padding: 0 10px;
   box-sizing: border-box;
+  overflow-y: auto; /* 允许垂直滚动 */
+  background: rgba(0, 0, 0, 0.1); /* 改为深色半透明背景，避免白屏闪烁 */
 }
 div.markdown ul {
   background-color: rgba(69,142,209,.04);
@@ -90,7 +127,7 @@ h2, h3{
   text-align: center;
 }
 h2, h3, h4, h5, h6 {
-  color: #00f;
+  color: #90caf9;
 }
 
 blockquote {
@@ -99,8 +136,13 @@ blockquote {
 
 p {
   text-indent: 2em;
-  margin: 0;
+  margin: 0 0 1em 0;
   padding: 0;
+  line-height: 1.6;
+}
+
+div.markdown {
+  line-height: 1.6;
 }
 
 img {
@@ -109,32 +151,4 @@ img {
 
 p::first-letter {
   font-weight: 600;
-}
-
-/** 最小尺寸 */
-div.app {
-  position: relative;
-  min-width: 640px;
-  width: 640px;
-  height: 480px;
-  font-size: 10px;
-  background-color: #fff;
-}
-
-@media (min-width: 960px) {
-  div.app {
-    position: relative;
-    width: 960px;
-    height: 540px;
-    font-size: 1em;
-  }
-}
-
-@media (min-width: 1280px) {
-  div.app {
-    position: relative;
-    width: 1280px;
-    height: 720px;
-    font-size: 1.25em;
-  }
 }

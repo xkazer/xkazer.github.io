@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // 启动服务器
-const HTTP_PORT = 80;
+const HTTP_PORT = 8080;
 const HTTPS_PORT = 443;
 
 

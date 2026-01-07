@@ -42,6 +42,8 @@ header nav img.header {
   left: 0;
   top: 2.5em;
   width: 100%;
+  height: 56.25%;
+  object-fit: contain;
   z-index: 5;
 }
 
@@ -50,9 +52,12 @@ div.markdown {
   position: absolute;
   width: 100%;
   top: calc(56.25% + 2.5em);
+  bottom: 2em;
+  padding: 1em;
 }
 
 div.markdown .title {
+  margin: 1em 2em;
   text-align: right;
 }
 div.markdown a {
