@@ -18,7 +18,7 @@ canvas {
   height: 100%;
 }
 .app {
-  width: 80vh;
+  width: 80vw;
   height: 100vh;
   background: rgba(255, 255, 255, 0.15); /* 非常浅的半透明白 */
   backdrop-filter: blur(20px); /* 毛玻璃效果 */

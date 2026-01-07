@@ -1,7 +1,15 @@
 
 /** 通用 */
+div.app {
+  width: 80vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 div.main {
-  margin-top: 30vh;
+  text-align: center;
 }
 
 input[type="button"] {
@@ -13,12 +21,16 @@ input[type="button"] {
 /** 搜索区 */
 div.search-form {
   position: relative;
-  width: 60em;
+  width: 100%;
+  max-width: 60em;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
 }
 
 select.search-type {
   appearance: none;
-  margin: 0;
   background: transparent;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
@@ -48,19 +60,24 @@ div.search-form .search-ico {
 }
 
 div.search-form .search-text {
-  width: 50em;
+  flex: 1;
   border-radius: 1.5em;
   padding-left: 2em;
+  padding-right: 4em;
 }
 
 div.search-form .search-btn {
   position: absolute;
-  right: 6em;
-  top: 0.75em;
-  width: 3em;
-  height: 3em;
+  right: 1em;
+  top: 18px;
+  transform: translateY(-50%);
+  width: 2em;
+  height: 2em;
   background-image: url('../png/search.png');
   background-repeat: no-repeat;
+  background-size: contain;
+  cursor: pointer;
+  z-index: 2;
 }
 
 /** 导航区 */
