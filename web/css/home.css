@@ -139,7 +139,7 @@ ul.categorys > li {
   display: inline-block;
 }
 
-ul.categorys > li:focus-within ul.link {
+ul.categorys > li:hover ul.link {
   display: flex;
 }
 
@@ -152,6 +152,9 @@ button.category {
   font-size: 0.9em;
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s, border-color 0.2s;
 }
 
