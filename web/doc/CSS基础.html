@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
-  <link href="../css/prism.css" rel="stylesheet" />
+  <link href="../css/prism.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
   <link rel="stylesheet" type="text/css" href="../css/common.css">
   <link rel="stylesheet" type="text/css" href="../css/markdown.css">
@@ -17,17 +16,18 @@
   <div class="app">
     <header>
       <nav>
+        <div class="logo"><a href="../index.html"><img src="../png/logo.png" alt="x">kazer</a></div>
         <ul>
           <li><a href="../doc/me.html">关于</a></li>
           <li><a href="../doc/note.html">笔记</a></li>
           <li><a href="../doc/study.html">学习</a></li>
           <li><a href="../home.html">导航</a></li>
         </ul>
-        <div class="title"><a href="../index.html">kazer</a></div>
       </nav>
     </header>
-    <div class="markdown">
-      <h4>盒子模型(box-sizing)</h4>
+    <main>
+      <div class="markdown">
+        <h4>盒子模型(box-sizing)</h4>
 <ul>
 <li>W3C标准盒子模型(content-box): 属性width，height只包含content，不包含border和padding</li>
 <li>IE盒子模型(border-box): 属性width，height包含content、border和padding</li>
@@ -411,7 +411,8 @@
 <p>新的BFC不会与浮动的.aside元素重叠。因此会根据包含块的宽度，和.aside的宽度，自动变窄。</p>
 </blockquote>
 
-    </div>
+      </div>
+    </main>
   </div>
   <script src="../js/prism.js"></script>
 </body>

@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
-  <link href="../css/prism.css" rel="stylesheet" />
+  <link href="../css/prism.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
   <link rel="stylesheet" type="text/css" href="../css/common.css">
   <link rel="stylesheet" type="text/css" href="../css/markdown.css">
@@ -17,17 +16,18 @@
   <div class="app">
     <header>
       <nav>
+        <div class="logo"><a href="../index.html"><img src="../png/logo.png" alt="x">kazer</a></div>
         <ul>
           <li><a href="../doc/me.html">关于</a></li>
           <li><a href="../doc/note.html">笔记</a></li>
           <li><a href="../doc/study.html">学习</a></li>
           <li><a href="../home.html">导航</a></li>
         </ul>
-        <div class="title"><a href="../index.html">kazer</a></div>
       </nav>
     </header>
-    <div class="markdown">
-      <h4>注入攻击</h4>
+    <main>
+      <div class="markdown">
+        <h4>注入攻击</h4>
 <p>安全设计原则: 数据与代码分离，它可以说是专门为解决注入攻击而生的</p>
 <p>注入攻击的本质，是把用户输入的数据当做代码执行。这里有两个关键条件:</p>
 <ul>
@@ -235,7 +235,8 @@ script-src不能使用unsafe-inline关键字(除非伴随一个nonce值), 也不
 </ul>
 </blockquote>
 
-    </div>
+      </div>
+    </main>
   </div>
   <script src="../js/prism.js"></script>
 </body>

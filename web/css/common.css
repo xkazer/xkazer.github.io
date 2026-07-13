@@ -1,44 +1,115 @@
-/** 全局样式 */
-header ul li {
-  list-style-type: none;
+/* ===== CSS 变量 ===== */
+:root {
+  --color-primary-light: #EAF4FB;
+  --color-primary:       #5BA4CF;
+  --color-primary-dark:  #2E86C1;
+  --color-bg:            #FFFFFF;
+  --color-text:          #2C3E50;
+  --color-text-muted:    #7F8C8D;
+  --color-border:        #D6EAF8;
+}
+
+/* ===== 全局重置 ===== */
+* {
+  box-sizing: border-box;
 }
 
 body {
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  /*background-image: url('../png/bg.png');*/
-  overflow: hidden; /* 防止整个页面滚动 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: var(--color-primary-light);
+  color: var(--color-text);
+  margin: 0;
 }
 
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* ===== Canvas 背景 ===== */
 canvas {
-  position: absolute;
-  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
   z-index: -1;
   width: 100%;
   height: 100%;
 }
-.app {
-  width: 80vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.15); /* 改为深色半透明背景，避免白屏闪烁 */
-  backdrop-filter: blur(20px); /* 毛玻璃效果 */
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  color: white; /* 文字用白色 */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+/* ===== 公共导航栏 ===== */
+header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 2em;
+  height: 3.5em;
+  display: flex;
+  align-items: center;
 }
 
-/* 文字配色 */
-h1,
-h2,
-h3 {
-  color: #ffffff;
+header nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-p, select {
-  color: rgba(255, 255, 255, 0.9);
+
+header nav .logo a {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
-a, button {
-  color: #90caf9;
+
+header nav .logo a img {
+  height: 1.2em !important;
+  width: 1.2em !important;
+  max-height: 1.2em !important;
+  max-width: 1.2em !important;
+  object-fit: contain;
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+header nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1.5em;
+}
+
+header nav ul li a {
+  font-size: 0.95em;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+header nav ul li a:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* ===== 页脚 ===== */
+footer {
+  text-align: center;
+  padding: 1.5em 0;
+}
+
+footer a {
+  font-size: 0.75em;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: var(--color-primary);
 }

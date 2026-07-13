@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
-  <link href="../css/prism.css" rel="stylesheet" />
+  <link href="../css/prism.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
   <link rel="stylesheet" type="text/css" href="../css/common.css">
   <link rel="stylesheet" type="text/css" href="../css/markdown.css">
@@ -17,17 +16,18 @@
   <div class="app">
     <header>
       <nav>
+        <div class="logo"><a href="../index.html"><img src="../png/logo.png" alt="x">kazer</a></div>
         <ul>
           <li><a href="../doc/me.html">关于</a></li>
           <li><a href="../doc/note.html">笔记</a></li>
           <li><a href="../doc/study.html">学习</a></li>
           <li><a href="../home.html">导航</a></li>
         </ul>
-        <div class="title"><a href="../index.html">kazer</a></div>
       </nav>
     </header>
-    <div class="markdown">
-      <h4>常用Loader</h4>
+    <main>
+      <div class="markdown">
+        <h4>常用Loader</h4>
 <blockquote>
 <ul>
 <li>file-loader: 把文件输出到一个文件夹中，在代码中通过相对URL去引用输出的文件(处理图片和字体)</li>
@@ -222,7 +222,8 @@ module.exports = {
 }
 </code></pre>
 
-    </div>
+      </div>
+    </main>
   </div>
   <script src="../js/prism.js"></script>
 </body>

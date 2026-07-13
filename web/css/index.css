@@ -1,90 +1,57 @@
-
-/** 全局 */
-a {
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: overline;
+/* ===== 首页布局 ===== */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/** 标题菜单样式 */
-header nav ul {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 10;
-}
-header nav ul li {
-  float: right;
-  margin: 0;
-  margin-right: 20px;
-  z-index: 10;
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 860px;
+  width: 90%;
+  margin: 0 auto;
+  padding-bottom: 2em;
 }
 
-header nav ul li a, header nav ul li a:hover {
-  color: #90caf9;
-  font-size: 1em;
-  font-weight: 600;
-  line-height: 2.5em;
-}
-
-header nav ul li:nth-child(odd){
-  margin-top: 2.5em;
-}
-
-header nav ul li:nth-child(odd) a{
-  color: #fff;
-}
-
-/** 主页图片 */
-header nav img.header {
-  position: absolute;
-  left: 0;
-  top: 2.5em;
-  width: 100%;
-  height: 56.25%;
-  object-fit: contain;
-  z-index: 5;
-}
-
-/** Markdown列表样式 */
+/* ===== 文章列表 ===== */
 div.markdown {
-  position: absolute;
-  width: 100%;
-  top: calc(56.25% + 2.5em);
-  bottom: 2em;
-  padding: 1em;
+  padding: 1.5em 0;
 }
 
 div.markdown .title {
-  margin: 1em 2em;
-  text-align: right;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 1.5em 0 0.5em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--color-border);
 }
-div.markdown a {
+
+div.markdown .list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  margin-top: 0.5em;
+}
+
+div.markdown .list a {
   display: block;
-}
-div.markdown a:hover {
-  text-decoration: underline;
-}
-
-/** 底部 */
-footer {
-  position: absolute;
-  left: 5%;
-  bottom: 0;
-  width: 90%;
-  text-align: center;
+  padding: 0.6em 1em;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 0.95em;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-footer a, footer a:hover, footer a:active {
-  color: #aaa;
-  font-size: 0.4em;
-}
-
-/** 最小尺寸 */
-div.app {
-  position: relative;
-  width: 80vw;
-  height: 100vh;
-  font-size: 1em;
+div.markdown .list a:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(91, 164, 207, 0.15);
+  color: var(--color-primary-dark);
+  text-decoration: none;
 }

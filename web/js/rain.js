@@ -3,7 +3,7 @@ class DigitalRain {
         this.canvas = document.getElementById('ad');
         this.ctx = this.canvas.getContext('2d');
         this.chars = '0101'.split('');
-        this.colors = ['#e3f2fd', '#bbdefb', '#90caf9', '#64b5f6'];
+        this.colors = ['#5BA4CF', '#2E86C1', '#7EC8E3', '#AED6F1'];
         this.fontSize = 20;
         
         this.drops = [];
@@ -46,7 +46,7 @@ class DigitalRain {
         this.frameCount++;
         
         // 使用离屏渲染优化性能
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        this.ctx.fillStyle = 'rgba(234, 244, 251, 0.15)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         this.ctx.font = `${this.fontSize}px 'Courier New', monospace`;

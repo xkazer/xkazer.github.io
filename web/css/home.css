@@ -1,110 +1,195 @@
+/* ===== home 页覆盖 header 样式 ===== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: transparent;
+  border-bottom: none;
+  padding: 0.8em 1.2em;
+  height: auto;
+  z-index: 10;
+}
 
-/** 通用 */
-div.app {
-  width: 80vw;
-  height: 100vh;
+/* ===== 导航页布局 ===== */
+body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  padding: 2em 1em;
 }
 
-div.main {
-  text-align: center;
-}
-
-input[type="button"] {
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-/** 搜索区 */
-div.search-form {
-  position: relative;
+.main {
+  margin-top: 20em;
   width: 100%;
-  max-width: 60em;
-  margin: 0 auto;
+  max-width: 900px;
+}
+
+/* ===== 搜索区 ===== */
+.search-form {
   display: flex;
   align-items: center;
   gap: 0.5em;
+  margin: 0 auto 2em;
+  max-width: 600px;
 }
 
 select.search-type {
   appearance: none;
-  background: transparent;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
-  background-position: 0.5em;
-  padding-left: 2.5em;
-  border: none;
-  min-width: 8em;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.5em 0.8em;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.9em;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+select.search-type:focus {
+  border-color: var(--color-primary);
 }
 
 select.search-type[type="baidu"] {
   background-image: url("http://www.baidu.com/favicon.ico");
+  background-repeat: no-repeat;
+  background-size: 1.2em;
+  background-position: 0.4em center;
+  padding-left: 2em;
 }
 select.search-type[type="bing"] {
   background-image: url("http://www.bing.com/favicon.ico");
+  background-repeat: no-repeat;
+  background-size: 1.2em;
+  background-position: 0.4em center;
+  padding-left: 2em;
 }
 select.search-type[type="google"] {
   background-image: url("http://www.google.com/favicon.ico");
-}
-
-div.search-form .search-ico {
-  margin-top: 0.5em;
-  margin-left: 0.5em;
-  width: 2em;
-  height: 2em;
-  background-image: url('https://www.bing.com/favicon.ico');
-  background-size: contain;
-}
-
-div.search-form .search-text {
-  flex: 1;
-  border-radius: 1.5em;
+  background-repeat: no-repeat;
+  background-size: 1.2em;
+  background-position: 0.4em center;
   padding-left: 2em;
-  padding-right: 4em;
 }
 
-div.search-form .search-btn {
-  position: absolute;
-  right: 1em;
-  top: 18px;
-  transform: translateY(-50%);
-  width: 2em;
-  height: 2em;
+.search-text {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.5em 1em;
+  font-size: 0.95em;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-text:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(91, 164, 207, 0.15);
+}
+
+.search-btn {
+  width: 2.2em;
+  height: 2.2em;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--color-primary);
   background-image: url('../png/search.png');
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 1.2em;
+  background-position: center;
   cursor: pointer;
-  z-index: 2;
+  transition: background-color 0.2s;
+  padding: 0;
 }
 
-/** 导航区 */
-ul.categorys li {
-  display: inline-block;
+.search-btn:hover {
+  background-color: var(--color-primary-dark);
 }
 
-ul.categorys li:focus-within ul.link {
-  display: block;
-}
-
-ul.link {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  display: none;
+/* ===== 导航分类 ===== */
+ul.categorys {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
   justify-content: center;
 }
 
-ul.link li {
-  margin: 0 2em;
-  padding-left: 2em;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
-  bac
+ul.categorys > li {
+  position: relative;
+  display: inline-block;
+}
+
+ul.categorys > li:focus-within ul.link {
+  display: flex;
 }
 
 button.category {
-    color: #90caf9;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.4em 1.2em;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+button.category:hover {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border-color: var(--color-primary);
+}
+
+ul.link {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 100;
+  min-width: 200px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(91, 164, 207, 0.15);
+  padding: 0.4em 0;
+  list-style: none;
+  margin: 0;
+  flex-direction: column;
+}
+
+ul.link li {
+  padding: 0.5em 1em 0.5em 2.8em;
+  background-repeat: no-repeat;
+  background-size: 1.2em;
+  background-position: 0.8em center;
+  transition: background-color 0.15s;
+}
+
+ul.link li:hover {
+  background-color: var(--color-primary-light);
+}
+
+ul.link li a {
+  color: var(--color-text);
+  font-size: 0.9em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+ul.link li a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: none;
 }

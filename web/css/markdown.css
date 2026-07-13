@@ -1,154 +1,151 @@
-
-/** 全局 */
-a {
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: overline;
+/* ===== 文章页布局 ===== */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/** 标题菜单样式 - 科技感优化 */
-header {
-  height: 10em;
-  background-position-y: 10em;
-  background-image: 
-    linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.8) 30%, #1a237e 60%, #311b92 80%, #4a148c 100%),
-    radial-gradient(circle at 50% 20%, rgba(0,255,255,0.3) 0%, transparent 50%);
-  border-radius: 0 0 9em 0;
-  box-shadow: 
-    0 4px 20px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.1);
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-header nav ul {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 10;
-}
-header nav ul li {
-  float: right;
-  margin: 0;
-  margin-right: 1.5em;
-  z-index: 10;
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  border: 1px solid rgba(0,255,255,0.3);
-  transition: all 0.3s ease;
-}
-
-header nav ul li:hover {
-  background: rgba(255,255,255,0.2);
-  border-color: #0ff;
-  box-shadow: 0 0 15px rgba(0,255,255,0.5);
-}
-
-header nav ul li a, header nav ul li a:hover {
-  color: #fff;
-  font-size: 1em;
-  font-weight: 600;
-  line-height: 2.5em;
-  padding: 0 1em;
-  text-shadow: 0 0 5px rgba(0,255,255,0.8);
-}
-
-header nav ul li:nth-child(odd){
-  margin-top: 2.5em;
-}
-
-header nav ul li:nth-child(odd) a{
-  color: #0ff;
-  text-shadow: 0 0 8px rgba(0,255,255,1);
-}
-
-/** 主页标题 - 科技感优化 */
-header nav div.title {
-  position: absolute;
-  top: 1.25em;
-  left: 1.25em;
-  padding-left: 1.5em;
-  color: #fff;
-  font-size: 3em;
-  font-weight: 700;
-  text-shadow: 
-    0 0 10px #0ff,
-    0 0 20px #0ff,
-    2px 2px 4px rgba(0,0,0,0.8);
-  background-image: url(../png/logo.png);
-  background-size: 1.2em;
-  background-repeat: no-repeat;
-  background-position: left center;
-  z-index: 10;
-  animation: titleGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes titleGlow {
-  0% { text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 2px 2px 4px rgba(0,0,0,0.8); }
-  100% { text-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 2px 2px 6px rgba(0,0,0,0.8); }
-}
-
-header nav div.title a, header nav div.title a:hover, header nav div.title a:active {
-  color: #fff;
-  text-decoration: none;
-  transition: text-shadow 0.3s ease;
-}
-
-header nav div.title a:hover {
-  text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 3px 3px 8px rgba(0,0,0,0.8);
-}
-
-/** Markdown列表样式 */
+/* ===== Markdown 内容区 ===== */
 div.markdown {
-  width: 100%;
-  height: calc(100% - 10em);
-  padding: 0 10px;
-  box-sizing: border-box;
-  overflow-y: auto; /* 允许垂直滚动 */
-  background: rgba(0, 0, 0, 0.1); /* 改为深色半透明背景，避免白屏闪烁 */
+  max-width: 800px;
+  width: 90%;
+  margin: 2em auto;
+  padding: 2em;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  line-height: 1.8;
+  color: var(--color-text);
+  overflow-y: auto;
 }
-div.markdown ul {
-  background-color: rgba(69,142,209,.04);
+
+/* ===== 标题 ===== */
+div.markdown h1,
+div.markdown h2,
+div.markdown h3 {
+  color: var(--color-text);
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--color-primary-light);
 }
-div.markdown .title {
-  text-align: right;
-}
+
+div.markdown h1 { font-size: 1.6em; }
+div.markdown h2 { font-size: 1.3em; }
+div.markdown h3 { font-size: 1.1em; }
+
+/* ===== 链接 ===== */
 div.markdown a {
-  display: block;
-  margin: 1em;
+  color: var(--color-primary);
 }
 div.markdown a:hover {
-  text-decoration: underline;
+  color: var(--color-primary-dark);
 }
 
-/** Markdown样式 */
-h2, h3{
-  text-align: center;
-}
-h2, h3, h4, h5, h6 {
-  color: #90caf9;
+/* ===== 代码块 ===== */
+div.markdown pre {
+  background: #F4F6F8;
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0 6px 6px 0;
+  padding: 1em 1.2em;
+  overflow-x: auto;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
 }
 
-blockquote {
-  background-color: #2333;
+div.markdown code {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
+  background: #F4F6F8;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
 }
 
-p {
-  text-indent: 2em;
-  margin: 0 0 1em 0;
+div.markdown pre code {
+  background: none;
   padding: 0;
-  line-height: 1.6;
 }
 
-div.markdown {
-  line-height: 1.6;
+/* ===== 引用块 ===== */
+div.markdown blockquote {
+  border-left: 3px solid var(--color-primary);
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  background: var(--color-primary-light);
+  color: var(--color-text-muted);
+  border-radius: 0 4px 4px 0;
 }
 
-img {
-  max-width: calc(100% - 40px);
+/* ===== 表格 ===== */
+div.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
 }
 
-p::first-letter {
+div.markdown th {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  padding: 0.6em 1em;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+div.markdown td {
+  padding: 0.5em 1em;
+  border: 1px solid var(--color-border);
+}
+
+div.markdown tr:nth-child(even) td {
+  background: #f9fbfd;
+}
+
+/* ===== 图片 ===== */
+div.markdown img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+/* ===== 段落 ===== */
+div.markdown p {
+  margin: 0 0 1em;
+}
+
+/* ===== 目录列表（分类页） ===== */
+div.markdown .title {
+  font-size: 0.85em;
   font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 1.5em 0 0.5em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+div.markdown .list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+div.markdown .list a {
+  display: block;
+  padding: 0.6em 1em;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 0.95em;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+div.markdown .list a:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(91, 164, 207, 0.15);
+  color: var(--color-primary-dark);
+  text-decoration: none;
 }

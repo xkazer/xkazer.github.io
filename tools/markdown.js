@@ -104,7 +104,7 @@ function translateMarkdownFile(file) {
     const md = new MarkdownIt();
     const result = md.render(data);
     const filename = path.basename(file, '.md');
-    const outputFile = path.join(g_config.outoutDir, `${filename}.html`);
+    const outputFile = path.join(g_config.outputDir, `${filename}.html`);
     console.log(`生成文件${outputFile}...`)
     recordFileInfo(file, outputFile);
     fs.writeFileSync(outputFile, g_markdown_template.replace(g_config.variable, result));
@@ -119,7 +119,7 @@ function translateMarkdownFile(file) {
  */
 function translateMarkdownMenu(name) {
   try {
-    const outputFile = path.join(g_config.outoutDir, `${name}.html`);
+    const outputFile = path.join(g_config.outputDir, `${name}.html`);
     const result = generateMarkdownMenu(name);
     console.log(`生成文件${outputFile}...`)
     fs.writeFileSync(outputFile, g_markdown_template.replace(g_config.variable, result));

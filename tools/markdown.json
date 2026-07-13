@@ -2,7 +2,7 @@
   "markdownDir": "../md",
   "markdownTemplate": "../web/template/markdown.html",
   "indexTemplate": "../web/template/index.html",
-  "outoutDir": "../web/doc",
+  "outputDir": "../web/doc",
   "outputIndex": "../web/index.html",
   "variable": "<!--%MARKDOWN%-->",
   "titleMap": {
