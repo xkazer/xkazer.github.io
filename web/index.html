@@ -11,6 +11,26 @@
 </head>
 <body>
   <script src="js/rain.js"></script>
+  <script>
+    function toggleRain() {
+      var btn = document.getElementById('rainToggle');
+      if (window.digitalRain) {
+        if (window.digitalRain.intervalId) {
+          window.digitalRain.stopAnimation();
+          btn.textContent = '☀️';
+          btn.title = '开启雨效果';
+          btn.classList.add('rain-off');
+          localStorage.setItem('rainEnabled', 'false');
+        } else {
+          window.digitalRain.startAnimation();
+          btn.textContent = '🌧';
+          btn.title = '关闭雨效果';
+          btn.classList.remove('rain-off');
+          localStorage.setItem('rainEnabled', 'true');
+        }
+      }
+    }
+  </script>
   <canvas id="ad"></canvas>
   <div class="app">
     <header>
@@ -22,6 +42,7 @@
           <li><a href="doc/study.html">学习</a></li>
           <li><a href="home.html">导航</a></li>
         </ul>
+        <button id="rainToggle" class="rain-toggle" onclick="toggleRain()" title="关闭雨效果">🌧</button>
       </nav>
     </header>
     <main>

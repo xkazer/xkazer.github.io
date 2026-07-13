@@ -30,6 +30,33 @@ class DigitalRain {
                 this.initDrops();
             }, 250);
         });
+
+        // 监听其他标签页修改 localStorage，实现多标签页同步
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'rainEnabled') {
+                this.syncButtonState(e.newValue !== 'false');
+                if (e.newValue === 'false') {
+                    this.stopAnimation();
+                } else {
+                    this.startAnimation();
+                }
+            }
+        });
+    }
+
+    // 同步按钮视觉状态
+    syncButtonState(enabled) {
+        const btn = document.getElementById('rainToggle');
+        if (!btn) return;
+        if (enabled) {
+            btn.textContent = '🌧';
+            btn.title = '关闭雨效果';
+            btn.classList.remove('rain-off');
+        } else {
+            btn.textContent = '☀️';
+            btn.title = '开启雨效果';
+            btn.classList.add('rain-off');
+        }
     }
     
     resizeCanvas() {
@@ -80,8 +107,12 @@ class DigitalRain {
     }
 }
 
-// 使用示例
 document.addEventListener('DOMContentLoaded', () => {
-    // 可以调整间隔时间控制速度
-    const digitalRain = new DigitalRain(70); // 70ms ≈ 14fps
+    window.digitalRain = new DigitalRain(70); // 70ms ≈ 14fps
+
+    // 读取全局开关状态
+    if (localStorage.getItem('rainEnabled') === 'false') {
+        window.digitalRain.stopAnimation();
+        window.digitalRain.syncButtonState(false);
+    }
 });
