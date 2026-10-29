@@ -47,9 +47,9 @@ function loadMarkdownTemplate() {
  * @param {*} htmlFile html文件路径
  */
 function recordFileInfo(file, htmlFile) {
-  const names = file.split(path.sep);
-  const len = names.length;
-  const subDir = len > 2 ? names[len - 2] : "_";
+  // 以 md 根目录为基准取分类，根目录下的散落文件归入 "_"（不进入导航分类）
+  const parts = path.relative(g_config.markdownDir, file).split(path.sep);
+  const subDir = parts.length > 1 ? parts[0] : "_";
   if (g_doc_map.has(subDir)) {
     g_doc_map.get(subDir).push(htmlFile);
   } else {
@@ -86,7 +86,7 @@ function generateMarkdownList(name, list, count, pathfix) {
 function generateMarkdownMenu(sub = null, count = 0, pathfix = '') {
   let renderStr = "";
   g_doc_map.forEach((list, key) => {
-    if ((!sub && key !== 'hole') || sub === key) {
+    if ((!sub && key !== 'hole' && key !== '_') || sub === key) {
       renderStr += generateMarkdownList(key, list, count, pathfix);
     }
   });
@@ -135,7 +135,8 @@ function translateMarkdownMenu(name) {
  function translateIndexFile() {
   try {
     const outputFile = g_config.outputIndex;
-    const result = generateMarkdownMenu(undefined, 1, 'doc/');
+    // 列表页与文章同目录（web/doc/），链接无需再加 doc/ 前缀
+    const result = generateMarkdownMenu(undefined, 1, '');
     console.log(`生成文件${outputFile}...`)
     fs.writeFileSync(outputFile, g_index_template.replace(g_config.variable, result));
   } catch (err) {

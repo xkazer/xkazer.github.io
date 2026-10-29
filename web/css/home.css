@@ -66,21 +66,21 @@ select.search-type:focus {
 }
 
 select.search-type[type="baidu"] {
-  background-image: url("http://www.baidu.com/favicon.ico");
+  background-image: url("https://www.baidu.com/favicon.ico");
   background-repeat: no-repeat;
   background-size: 1.2em;
   background-position: 0.4em center;
   padding-left: 2em;
 }
 select.search-type[type="bing"] {
-  background-image: url("http://www.bing.com/favicon.ico");
+  background-image: url("https://www.bing.com/favicon.ico");
   background-repeat: no-repeat;
   background-size: 1.2em;
   background-position: 0.4em center;
   padding-left: 2em;
 }
 select.search-type[type="google"] {
-  background-image: url("http://www.google.com/favicon.ico");
+  background-image: url("https://www.google.com/favicon.ico");
   background-repeat: no-repeat;
   background-size: 1.2em;
   background-position: 0.4em center;

@@ -3,7 +3,7 @@
   "markdownTemplate": "../web/template/markdown.html",
   "indexTemplate": "../web/template/index.html",
   "outputDir": "../web/doc",
-  "outputIndex": "../web/index.html",
+  "outputIndex": "../web/doc/index.html",
   "variable": "<!--%MARKDOWN%-->",
   "titleMap": {
     "study": "学习",

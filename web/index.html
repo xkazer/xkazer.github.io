@@ -4,55 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" type="text/css" href="css/skeleton.css">
-  <link rel="stylesheet" type="text/css" href="css/common.css">
-  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <link rel="stylesheet" type="text/css" href="css/skeleton.css?v=5">
+  <link rel="stylesheet" type="text/css" href="css/common.css?v=5">
+  <link rel="stylesheet" type="text/css" href="css/game.css?v=5">
   <title>xkazer</title>
 </head>
 <body>
-  <script src="js/rain.js"></script>
-  <script>
-    function toggleRain() {
-      var btn = document.getElementById('rainToggle');
-      if (window.digitalRain) {
-        if (window.digitalRain.intervalId) {
-          window.digitalRain.stopAnimation();
-          btn.textContent = '☀️';
-          btn.title = '开启雨效果';
-          btn.classList.add('rain-off');
-          localStorage.setItem('rainEnabled', 'false');
-        } else {
-          window.digitalRain.startAnimation();
-          btn.textContent = '🌧';
-          btn.title = '关闭雨效果';
-          btn.classList.remove('rain-off');
-          localStorage.setItem('rainEnabled', 'true');
-        }
-      }
-    }
-  </script>
+  <script src="js/rain.js?v=5"></script>
   <canvas id="ad"></canvas>
   <div class="app">
-    <header>
-      <nav>
-        <div class="logo"><a href="index.html"><img src="png/logo.png" alt="x">kazer</a></div>
-        <ul>
-          <li><a href="doc/me.html">关于</a></li>
-          <li><a href="doc/note.html">笔记</a></li>
-          <li><a href="doc/study.html">学习</a></li>
-          <li><a href="home.html">导航</a></li>
-        </ul>
-        <button id="rainToggle" class="rain-toggle" onclick="toggleRain()" title="关闭雨效果">🌧</button>
-      </nav>
-    </header>
     <main>
-      <div class="markdown">
-        <div class="title">md</div><div class="list"><a href="doc/me.html">me</a></div><div class="title">笔记</div><div class="list"><a href="doc/Android Studio记录.html">Android Studio记录</a></div>
+      <div class="game-bar">
+        <span>分数<b id="score">0</b></span>
+        <span>方块<b id="bricks">0</b></span>
+        <span>球<b id="balls">3</b></span>
+        <span>关卡<b id="level">1</b></span>
+        <span class="spacer"></span>
+        <button id="restart" class="ghost-btn">重开</button>
+      </div>
+      <div class="stage">
+        <canvas id="game"></canvas>
+        <div id="overlay" class="overlay hidden">
+          <div class="overlay-card">
+            <p id="overlayTitle" class="overlay-title">准备好了吗</p>
+            <p id="overlayDesc" class="overlay-desc">移动鼠标，上下左右四块挡板会同时跟着你走</p>
+            <button id="startBtn" class="primary-btn">开始</button>
+          </div>
+        </div>
       </div>
     </main>
     <footer>
       <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备2022072679号-1</a>
     </footer>
   </div>
+  <script src="js/game.js?v=5"></script>
 </body>
 </html>
