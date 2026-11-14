@@ -1,0 +1,31 @@
+.nes-card code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--blue-100);
+  font-family: Consolas, monospace;
+}
+
+.nes-keys { margin: 16px 0 0; }
+.nes-keys b { color: var(--blue-700); }
+
+.nes-bar { margin-top: 0; justify-content: space-between; }
+.nes-name { min-width: 0; font-size: 16px; word-break: break-all; }
+
+.nes-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(360px, 70vh, 640px);
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(20, 87, 217, .2);
+}
+
+.nes-stage #game {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 720px) {
+  .nes-stage { height: clamp(300px, 60vh, 520px); }
+}

@@ -18,7 +18,7 @@
     { name: '文件对比', href: 'diff.html' }
   ];
   var FUN = [
-    { name: '红白机ROM加载', href: '' }
+    { name: '红白机ROM加载', href: 'nes.html' }
   ];
   var ENGINES = {
     baidu: 'https://www.baidu.com/s?wd=',

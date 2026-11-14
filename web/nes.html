@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/nes.css?v=1">
+  <title>红白机 - xkazer</title>
+</head>
+<body>
+  <div class="tool-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#fun">&larr; 返回</a>
+      <h1>红白机</h1>
+    </header>
+
+    <main class="tool-card nes-card">
+      <section id="nesPick">
+        <p class="desc">加载本地 <code>.nes</code> 游戏文件，在浏览器中运行。文件仅在本地读取，不会上传到服务器。</p>
+        <div id="nesDrop" class="file-drop" tabindex="0" role="button" aria-label="选择 ROM 文件">
+          <div class="drop-title">点击选择或拖入 .nes 文件</div>
+          <div class="drop-sub">仅支持 iNES 格式的红白机 ROM</div>
+        </div>
+        <input id="nesFile" type="file" accept=".nes" hidden>
+        <div id="nesStatus" class="status" role="status"></div>
+        <p class="desc nes-keys">
+          默认按键：<b>W A S D</b> 移动，<b>K</b> = A，<b>J</b> = B，<b>L</b> = Start，<b>Enter</b> = Select。
+          可在模拟器菜单的"控制"中修改键位；手机端使用屏幕虚拟按键。
+        </p>
+      </section>
+
+      <section id="nesPlay" hidden>
+        <div class="bar nes-bar">
+          <strong id="nesName" class="nes-name"></strong>
+          <button type="button" id="nesReload" class="btn ghost sm">更换游戏</button>
+        </div>
+        <div class="nes-stage"><div id="game"></div></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2022072679号-1</a>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/nes.js?v=4"></script>
+</body>
+</html>
