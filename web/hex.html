@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/hex.css?v=1">
+  <title>十六进制编辑器 - xkazer</title>
+</head>
+<body>
+  <div class="hex-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#tools">&larr; 返回</a>
+      <h1>十六进制编辑器</h1>
+      <span id="fileName" class="file-name"></span>
+    </header>
+
+    <div class="hex-toolbar">
+      <button type="button" id="btnOpen" class="btn sm">打开文件</button>
+      <button type="button" id="btnSave" class="btn sm" title="Ctrl+S，以下载方式保存">保存（下载）</button>
+      <span class="sep"></span>
+      <button type="button" id="btnUndo" class="btn ghost sm" title="Ctrl+Z">撤销</button>
+      <button type="button" id="btnRedo" class="btn ghost sm" title="Ctrl+Y">重做</button>
+      <span class="sep"></span>
+      <button type="button" id="btnFind" class="btn ghost sm" title="Ctrl+F">查找</button>
+      <button type="button" id="btnReplace" class="btn ghost sm" title="Ctrl+H">替换</button>
+      <button type="button" id="btnGoto" class="btn ghost sm" title="Ctrl+G">转到</button>
+      <span class="sep"></span>
+      <button type="button" id="btnMode" class="btn ghost sm" title="Insert 键切换改写/插入">改写</button>
+      <label class="opt">每行
+        <select id="selBpr" class="sel">
+          <option value="8">8 字节</option>
+          <option value="16" selected>16 字节</option>
+          <option value="32">32 字节</option>
+        </select>
+      </label>
+      <label class="opt">字符
+        <select id="selCharset" class="sel">
+          <option value="ascii" selected>ASCII</option>
+          <option value="ansi">ANSI (Latin-1)</option>
+        </select>
+      </label>
+    </div>
+
+    <section id="gotoPanel" class="hex-panel" hidden>
+      <div class="fp-row">
+        <label class="fp-lbl" for="gInput">转到偏移</label>
+        <input id="gInput" class="inp fp-input short" type="text" placeholder="如 1F40，+10 / -10 为相对当前位置" autocomplete="off" spellcheck="false">
+        <select id="gBase" class="sel">
+          <option value="hex" selected>十六进制</option>
+          <option value="dec">十进制</option>
+        </select>
+        <button type="button" id="gGo" class="btn sm">转到</button>
+        <button type="button" id="gClose" class="btn ghost sm">关闭</button>
+        <span id="gMsg" class="fp-msg"></span>
+      </div>
+    </section>
+
+    <section id="findPanel" class="hex-panel" hidden>
+      <div class="fp-row">
+        <label class="fp-lbl" for="fInput">查找</label>
+        <input id="fInput" class="inp fp-input" type="text" placeholder="十六进制如 49 4E 44 58（?? 为通配符）；文本直接输入" autocomplete="off" spellcheck="false">
+        <select id="fType" class="sel" title="查找类型">
+          <option value="hex" selected>十六进制</option>
+          <option value="text">文本</option>
+        </select>
+        <select id="fEnc" class="sel" title="文本编码">
+          <option value="utf8" selected>UTF-8</option>
+          <option value="utf16le">UTF-16LE</option>
+          <option value="latin1">ANSI (Latin-1)</option>
+        </select>
+        <label class="opt"><input type="checkbox" id="fCase"> 忽略大小写</label>
+      </div>
+      <div class="fp-row" id="rRow" hidden>
+        <label class="fp-lbl" for="rInput">替换为</label>
+        <input id="rInput" class="inp fp-input" type="text" placeholder="留空表示删除匹配内容" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="fp-row">
+        <button type="button" id="fPrev" class="btn sm" title="Shift+Enter">上一个</button>
+        <button type="button" id="fNext" class="btn sm" title="Enter">下一个</button>
+        <button type="button" id="fAll" class="btn ghost sm">查找全部</button>
+        <span class="rep-only" hidden>
+          <button type="button" id="rOne" class="btn ghost sm">替换</button>
+          <button type="button" id="rAll" class="btn ghost sm">全部替换</button>
+        </span>
+        <button type="button" id="fClose" class="btn ghost sm">关闭</button>
+        <span id="fMsg" class="fp-msg"></span>
+      </div>
+      <div id="fResults" class="find-results" hidden></div>
+    </section>
+
+    <div id="hexMain" class="hex-main">
+      <div id="hexWrap" class="hex-wrap">
+        <canvas id="hexCanvas"></canvas>
+        <div id="hexScroll" class="hex-scroll"><div id="hexSpacer"></div></div>
+        <textarea id="hexSink" class="hex-sink" aria-label="键盘输入" autocomplete="off" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <div class="hex-status">
+      <span id="stFile">未打开文件</span>
+      <span>偏移 <b id="stOff">-</b></span>
+      <span>= <b id="stVal">-</b></span>
+      <span>块 <b id="stBlock">-</b></span>
+      <span>大小 <b id="stSel">0</b></span>
+      <span id="stMode">改写</span>
+      <span id="stMod">未修改</span>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/hexcore.js?v=1"></script>
+  <script src="js/hex.js?v=1"></script>
+</body>
+</html>

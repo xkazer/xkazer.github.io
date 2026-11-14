@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/pe.css?v=1">
+  <title>PE文件分析 - xkazer</title>
+</head>
+<body>
+  <div class="pe-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#tools">&larr; 返回</a>
+      <h1>PE文件分析</h1>
+      <span id="fileName" class="file-name"></span>
+    </header>
+
+    <div id="dropZone" class="pe-drop" tabindex="0" role="button" aria-label="选择或拖放 PE 文件">
+      <div class="drop-title">点击选择文件，或将文件拖放到此处</div>
+      <div class="drop-sub">支持 EXE / DLL / SYS / OCX / SCR 等 PE 文件，文件仅在浏览器本地解析，不会上传</div>
+    </div>
+
+    <div id="errorBox" class="pe-error" hidden></div>
+
+    <main id="result" class="pe-result" hidden>
+      <nav id="peTabs" class="pe-tabs" role="tablist"></nav>
+      <section id="pePanel" class="pe-panel" role="tabpanel"></section>
+    </main>
+  </div>
+
+  <input type="file" id="fileInput" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/pecore.js?v=1"></script>
+  <script src="js/pe.js?v=1"></script>
+</body>
+</html>

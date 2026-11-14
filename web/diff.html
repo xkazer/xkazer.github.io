@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/diff.css?v=1">
+  <title>文件对比 - xkazer</title>
+</head>
+<body>
+  <div class="df-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#tools">&larr; 返回</a>
+      <h1>文件对比</h1>
+    </header>
+
+    <div class="df-toolbar">
+      <div class="df-group">
+        <button type="button" id="modeText" class="btn sm" data-mode="text">文本对比</button>
+        <button type="button" id="modeBin" class="btn ghost sm" data-mode="bin">二进制对比</button>
+      </div>
+      <span class="sep"></span>
+      <div class="df-group">
+        <button type="button" id="btnCompare" class="btn sm" title="Ctrl+Enter">对比</button>
+        <button type="button" id="btnEdit" class="btn ghost sm" hidden>返回编辑</button>
+        <button type="button" id="btnSwap" class="btn ghost sm" title="交换左右两侧">交换</button>
+      </div>
+      <span class="sep"></span>
+      <div class="df-group" data-for="text">
+        <label class="opt">空白
+          <select id="selWs" class="sel">
+            <option value="none">区分</option>
+            <option value="trim">忽略行首尾空白</option>
+            <option value="collapse">忽略空白数量差异</option>
+            <option value="all">忽略所有空白</option>
+          </select>
+        </label>
+        <label class="opt"><input type="checkbox" id="chkEol" checked> 忽略换行符(LF/CRLF)</label>
+        <label class="opt"><input type="checkbox" id="chkCase"> 忽略大小写</label>
+      </div>
+      <span class="sep" data-for="text"></span>
+      <div class="df-group" id="viewGroup">
+        <span class="df-lbl">显示</span>
+        <button type="button" class="btn sm" data-view="all">全部</button>
+        <button type="button" class="btn ghost sm" data-view="diff" title="隐藏相同内容，只显示差异及其上下几行">仅差异</button>
+        <button type="button" class="btn ghost sm" data-view="same">仅相同</button>
+        <label class="opt" title="仅差异模式下，差异上下保留的行数">上下文
+          <input type="number" id="ctxNum" class="inp df-num" min="0" max="50" value="3"> 行
+        </label>
+      </div>
+      <span class="sep"></span>
+      <div class="df-group">
+        <button type="button" id="btnPrev" class="btn ghost sm" title="Shift+F8 / Alt+↑">上一处</button>
+        <button type="button" id="btnNext" class="btn ghost sm" title="F8 / Alt+↓">下一处</button>
+      </div>
+      <div class="df-group" data-for="bin" hidden>
+        <input type="text" id="gotoOff" class="inp df-goto" placeholder="转到偏移(十六进制)" autocomplete="off" spellcheck="false">
+        <button type="button" id="btnGoto" class="btn ghost sm">转到</button>
+      </div>
+    </div>
+
+    <div id="notice" class="df-notice" hidden></div>
+
+    <div id="main" class="df-main">
+      <div id="inputView" class="df-inputs">
+        <div class="df-in" data-side="0">
+          <div class="df-in-head">
+            <b>左侧</b>
+            <span class="meta" id="meta0">空</span>
+            <button type="button" class="btn ghost sm" data-open="0">打开文件</button>
+            <button type="button" class="btn ghost sm" data-clear="0">清除</button>
+          </div>
+          <textarea id="ta0" class="df-ta" spellcheck="false" placeholder="粘贴文本，或拖入 / 打开文件"></textarea>
+        </div>
+        <div class="df-in" data-side="1">
+          <div class="df-in-head">
+            <b>右侧</b>
+            <span class="meta" id="meta1">空</span>
+            <button type="button" class="btn ghost sm" data-open="1">打开文件</button>
+            <button type="button" class="btn ghost sm" data-clear="1">清除</button>
+          </div>
+          <textarea id="ta1" class="df-ta" spellcheck="false" placeholder="粘贴文本，或拖入 / 打开文件"></textarea>
+        </div>
+      </div>
+
+      <div id="resView" class="df-res" hidden>
+        <div class="df-infos">
+          <div class="df-info" id="info0"></div>
+          <div class="df-info" id="info1"></div>
+        </div>
+        <div class="df-body">
+          <canvas id="mini" class="df-mini"></canvas>
+          <div class="df-pane" id="pane0"><div class="df-spacer" id="sp0"><div class="df-rows" id="rows0"></div></div></div>
+          <div class="df-pane" id="pane1"><div class="df-spacer" id="sp1"><div class="df-rows" id="rows1"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="df-status" id="status">请在左右两侧输入文本或打开文件，然后点击“对比”</div>
+  </div>
+
+  <input type="file" id="fileInput" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="js/diffcore.js?v=1"></script>
+  <script src="js/diff.js?v=1"></script>
+</body>
+</html>
