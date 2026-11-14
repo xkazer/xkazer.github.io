@@ -1,13 +1,9 @@
 {
-  "markdownDir": "../md",
-  "markdownTemplate": "../web/template/markdown.html",
-  "indexTemplate": "../web/template/index.html",
-  "outputDir": "../web/doc",
-  "outputIndex": "../web/doc/index.html",
+  "markdownDir": "../md/maxim",
+  "markdownTemplate": "../web/template/maxim.html",
+  "outputDir": "../web/maxim",
+  "outputPage": "index.html",
+  "outputJson": "maxim.json",
   "variable": "<!--%MARKDOWN%-->",
-  "titleMap": {
-    "study": "学习",
-    "note": "笔记",
-    "hole": "树洞"
-  }
+  "separator": " —— "
 }

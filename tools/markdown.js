@@ -1,162 +1,106 @@
 const fs = require('fs');
 const path = require('path');
-const MarkdownIt = require('markdown-it');
-/** 全局变量 */
+
+/** 全局配置（相对路径均以本文件所在目录为基准） */
 const g_config = require('./markdown.json');
-const g_doc_map = new Map();
-let g_markdown_template = '';
-let g_index_template = '';
+const resolve = (p) => path.resolve(__dirname, p);
 
 /**
- * 递归遍历目录
- * @param {*} dir
- * @return 文件数组 
+ * 转义 HTML 特殊字符
  */
-function treeDir(dir, list=[]) {
-  console.debug(`读取目录${dir}...`);
-  const files = fs.readdirSync(dir);
-  files.forEach(item => {
-    const fullPath = path.join(dir, item);
-    const stats = fs.statSync(fullPath);
-    if (stats.isDirectory()) {
-      treeDir(fullPath, list);
-    } else {
-      list.push(fullPath);
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/**
+ * 解析单个格言 Markdown 文件
+ * 每条格言一个无序列表项，可选用分隔符分出出处：`- 内容 —— 出处`
+ * @param {string} file 文件路径
+ * @return {{text: string, source: string}[]}
+ */
+function parseMaximFile(file) {
+  const items = [];
+  const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+  lines.forEach((raw, index) => {
+    const line = raw.trim();
+    if (!line) return;
+    const match = /^[-*+]\s+(.+)$/.exec(line);
+    if (!match) {
+      console.warn(`警告：${path.basename(file)} 第 ${index + 1} 行不是列表项，已跳过：${line}`);
+      return;
     }
-  });
-  return list;
-}
-
-/**
- * 加载Markdown文件模板
- */
-function loadMarkdownTemplate() {
-  try {
-    console.log(`加载markdown模块${g_config.markdownTemplate}...`);
-    g_markdown_template = fs.readFileSync(g_config.markdownTemplate, 'utf8');
-    console.log(`加载markdown模块${g_config.indexTemplate}...`);
-    g_index_template = fs.readFileSync(g_config.indexTemplate, 'utf8');
-  } catch (err) {
-    console.warn(err);
-  }
-}
-
-/**
- * 记录文件信息
- * @param {*} file 文件路径
- * @param {*} htmlFile html文件路径
- */
-function recordFileInfo(file, htmlFile) {
-  // 以 md 根目录为基准取分类，根目录下的散落文件归入 "_"（不进入导航分类）
-  const parts = path.relative(g_config.markdownDir, file).split(path.sep);
-  const subDir = parts.length > 1 ? parts[0] : "_";
-  if (g_doc_map.has(subDir)) {
-    g_doc_map.get(subDir).push(htmlFile);
-  } else {
-    g_doc_map.set(subDir, [htmlFile]);
-  }
-}
-
-/**
- * 生成Markdown简介
- * @param {*} name  类别(目录名称)
- * @param {*} list  列表
- * @param {string} pathfix 相对路径较正
- * @param {number} count 展示条目 
- */
-function generateMarkdownList(name, list, count, pathfix) {
-  const title = g_config.titleMap?.hasOwnProperty(name) ? g_config.titleMap[name] : name;
-  const size = (count != 0 && count < list.length) ? count : list.length;
-  console.debug(`生成目录${title}条目${size}...`);
-  let renderHtml = `<div class="title">${title}</div><div class="list">`;
-  for (let i = 0; i < size; i ++) {
-    const file = list[i];
-    const link = pathfix + path.basename(file);
-    renderHtml += `<a href="${link}">${path.basename(file, ".html")}</a>`;
-  }
-  renderHtml += "</div>";
-  return renderHtml;
-}
-
-/**
- * 生成Markdown菜单项
- * @param {*} sub 分类名称 
- * @param {string} pathfix 相对路径较正
- */
-function generateMarkdownMenu(sub = null, count = 0, pathfix = '') {
-  let renderStr = "";
-  g_doc_map.forEach((list, key) => {
-    if ((!sub && key !== 'hole' && key !== '_') || sub === key) {
-      renderStr += generateMarkdownList(key, list, count, pathfix);
+    const content = match[1].trim();
+    const pos = content.lastIndexOf(g_config.separator);
+    const text = (pos === -1 ? content : content.slice(0, pos)).trim();
+    const source = pos === -1 ? '' : content.slice(pos + g_config.separator.length).trim();
+    if (!text) {
+      console.warn(`警告：${path.basename(file)} 第 ${index + 1} 行格言内容为空，已跳过`);
+      return;
     }
+    items.push({ text, source });
   });
-  return renderStr;
+  return items;
 }
 
 /**
- * 将markdown转化为html
- * @param {*} file 文件路径
+ * 读取目录下所有 .md 文件，生成 "分类 -> 格言数组"
  */
-function translateMarkdownFile(file) {
-  console.log(`处理文件${file}...`)
-  try {
-    const data = fs.readFileSync(file, 'utf8');
-    const md = new MarkdownIt();
-    const result = md.render(data);
-    const filename = path.basename(file, '.md');
-    const outputFile = path.join(g_config.outputDir, `${filename}.html`);
-    console.log(`生成文件${outputFile}...`)
-    recordFileInfo(file, outputFile);
-    fs.writeFileSync(outputFile, g_markdown_template.replace(g_config.variable, result));
-  } catch (err) {
-    console.warn(err);
-  }
+function collectMaxims() {
+  const dir = resolve(g_config.markdownDir);
+  const data = {};
+  fs.readdirSync(dir)
+    .filter(name => name.toLowerCase().endsWith('.md'))
+    .sort((a, b) => a.localeCompare(b, 'zh-CN'))
+    .forEach(name => {
+      const category = path.basename(name, '.md');
+      console.log(`处理文件${name}...`);
+      const items = parseMaximFile(path.join(dir, name));
+      if (!items.length) {
+        console.warn(`警告：${name} 没有有效格言，已跳过`);
+        return;
+      }
+      // 源文件按时间正序追加，输出时倒序，最新的排在最上面
+      data[category] = items.reverse();
+    });
+  return data;
 }
 
 /**
- * 生成Markdown目录页
- * @param {*} name 类别名称
+ * 生成格言列表 HTML（样式与主页格言列表一致）
  */
-function translateMarkdownMenu(name) {
-  try {
-    const outputFile = path.join(g_config.outputDir, `${name}.html`);
-    const result = generateMarkdownMenu(name);
-    console.log(`生成文件${outputFile}...`)
-    fs.writeFileSync(outputFile, g_markdown_template.replace(g_config.variable, result));
-  } catch (err) {
-    console.warn(err);
-  }
-}
-
-/**
- * 根据markdown生成index.html
- * @param {*} file 文件路径
- */
- function translateIndexFile() {
-  try {
-    const outputFile = g_config.outputIndex;
-    // 列表页与文章同目录（web/doc/），链接无需再加 doc/ 前缀
-    const result = generateMarkdownMenu(undefined, 1, '');
-    console.log(`生成文件${outputFile}...`)
-    fs.writeFileSync(outputFile, g_index_template.replace(g_config.variable, result));
-  } catch (err) {
-    console.warn(err);
-  }
+function renderHtml(data) {
+  return Object.keys(data).map(category => {
+    const rows = data[category].map(it => {
+      const src = it.source ? `<span class="src">${escapeHtml(it.source)}</span>` : '';
+      return `<div class="maxim-item"><span>${escapeHtml(it.text)}</span>${src}</div>`;
+    }).join('\n');
+    return `<div class="maxim-group">\n<h3>${escapeHtml(category)}</h3>\n${rows}\n</div>`;
+  }).join('\n');
 }
 
 /**
  * 主函数
  */
 function main() {
-  loadMarkdownTemplate();
-  treeDir(g_config.markdownDir)
-    .forEach(file => translateMarkdownFile(file));
-  // console.debug(g_doc_map);
-  Object.keys(g_config.titleMap)
-    .forEach(name => {
-      translateMarkdownMenu(name);
-    });
-  translateIndexFile();
+  const data = collectMaxims();
+  const outputDir = resolve(g_config.outputDir);
+  fs.mkdirSync(outputDir, { recursive: true });
+
+  const jsonFile = path.join(outputDir, g_config.outputJson);
+  console.log(`生成文件${jsonFile}...`);
+  fs.writeFileSync(jsonFile, JSON.stringify(data, null, 2) + '\n');
+
+  const template = fs.readFileSync(resolve(g_config.markdownTemplate), 'utf8');
+  const pageFile = path.join(outputDir, g_config.outputPage);
+  console.log(`生成文件${pageFile}...`);
+  fs.writeFileSync(pageFile, template.replace(g_config.variable, () => renderHtml(data)));
+
+  const total = Object.values(data).reduce((sum, list) => sum + list.length, 0);
+  console.log(`完成：${Object.keys(data).length} 个分类，共 ${total} 条格言`);
 }
 
 main();
