@@ -1,0 +1,50 @@
+.snake-stage {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(20, 87, 217, .2);
+}
+
+.snake-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #eef5fe;
+}
+
+/* 屏幕方向键：仅在触屏设备显示 */
+.dpad {
+  display: none;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(2, 56px);
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .dpad { display: grid; }
+}
+
+.dp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--blue-700);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff 0%, #eef5fe 100%);
+  border: 1px solid #e1ecfc;
+  box-shadow: 0 4px 12px rgba(47, 124, 240, .16);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dp:active { background: var(--blue-100); transform: translateY(1px); }
+
+.dp-up { grid-column: 2; grid-row: 1; }
+.dp-left { grid-column: 1; grid-row: 2; }
+.dp-down { grid-column: 2; grid-row: 2; }
+.dp-right { grid-column: 3; grid-row: 2; }

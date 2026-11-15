@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/play.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/g2048.css?v=1">
+  <title>2048 - xkazer</title>
+</head>
+<body>
+  <div class="tool-page play-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#fun">&larr; 返回</a>
+      <h1>2048</h1>
+    </header>
+
+    <main class="tool-card play-card">
+      <div class="play-bar">
+        <div class="stat"><span>分数</span><b id="score">0</b></div>
+        <div class="stat"><span>最高分</span><b id="best">0</b></div>
+        <button type="button" id="btnNew" class="btn sm">新游戏</button>
+      </div>
+
+      <div id="stage" class="play-stage">
+        <div id="board" class="g2048-board"></div>
+        <div id="overlay" class="play-overlay" hidden>
+          <h2 id="overTitle"></h2>
+          <p id="overDesc"></p>
+          <div class="acts">
+            <button type="button" id="btnContinue" class="btn ghost" hidden>继续游戏</button>
+            <button type="button" id="btnAgain" class="btn">再来一局</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="play-tip">电脑：方向键或 W A S D 移动<br>手机：在棋盘上滑动。相同数字相撞会合并，合出 2048 即获胜</p>
+    </main>
+
+    <footer class="footer">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2022072679号-1</a>
+    </footer>
+  </div>
+
+  <script src="js/g2048.js?v=1"></script>
+</body>
+</html>

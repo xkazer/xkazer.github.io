@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/play.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/snake.css?v=1">
+  <title>贪食蛇 - xkazer</title>
+</head>
+<body>
+  <div class="tool-page play-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#fun">&larr; 返回</a>
+      <h1>贪食蛇</h1>
+    </header>
+
+    <main class="tool-card play-card">
+      <div class="play-bar">
+        <div class="stat"><span>分数</span><b id="score">0</b></div>
+        <div class="stat"><span>最高分</span><b id="best">0</b></div>
+        <button type="button" id="btnPause" class="btn sm">暂停</button>
+      </div>
+
+      <div id="stage" class="play-stage snake-stage">
+        <canvas id="canvas" class="snake-canvas"></canvas>
+        <div id="overlay" class="play-overlay">
+          <h2 id="overTitle">贪食蛇</h2>
+          <p id="overDesc">吃到食物变长，不要撞墙或撞到自己</p>
+          <div class="acts">
+            <button type="button" id="btnStart" class="btn">开始游戏</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="dpad" class="dpad" aria-label="方向键">
+        <button type="button" class="dp dp-up" data-dir="up" aria-label="上">&uarr;</button>
+        <button type="button" class="dp dp-left" data-dir="left" aria-label="左">&larr;</button>
+        <button type="button" class="dp dp-down" data-dir="down" aria-label="下">&darr;</button>
+        <button type="button" class="dp dp-right" data-dir="right" aria-label="右">&rarr;</button>
+      </div>
+
+      <p class="play-tip">电脑：方向键或 W A S D 控制方向，空格暂停<br>手机：在棋盘上滑动，或使用下方方向键。吃得越多，速度越快</p>
+    </main>
+
+    <footer class="footer">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2022072679号-1</a>
+    </footer>
+  </div>
+
+  <script src="js/snake.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tool.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/play.css?v=1">
+  <link rel="stylesheet" type="text/css" href="css/tetris.css?v=1">
+  <title>俄罗斯方块 - xkazer</title>
+</head>
+<body>
+  <div class="tool-page play-page">
+    <header class="tool-head">
+      <a class="back" href="index.html#fun">&larr; 返回</a>
+      <h1>俄罗斯方块</h1>
+    </header>
+
+    <main class="tool-card play-card">
+      <div class="play-bar">
+        <div class="stat"><span>分数</span><b id="score">0</b></div>
+        <div class="stat"><span>最高分</span><b id="best">0</b></div>
+        <div class="stat"><span>行数</span><b id="lines">0</b></div>
+        <div class="stat next-box"><span>下一个</span><canvas id="next"></canvas></div>
+      </div>
+
+      <div id="stage" class="play-stage tet-stage">
+        <canvas id="canvas" class="tet-canvas"></canvas>
+        <div id="overlay" class="play-overlay">
+          <h2 id="overTitle">俄罗斯方块</h2>
+          <p id="overDesc">消除整行得分，方块堆到顶部则游戏结束</p>
+          <div class="acts">
+            <button type="button" id="btnStart" class="btn">开始游戏</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tet-actions">
+        <button type="button" id="btnPause" class="btn ghost sm">暂停</button>
+        <button type="button" id="btnRestart" class="btn ghost sm">重新开始</button>
+      </div>
+
+      <div id="ctrl" class="tet-ctrl" aria-label="操作按键">
+        <button type="button" class="tp" data-act="left" aria-label="左移">&larr;</button>
+        <button type="button" class="tp" data-act="rotate" aria-label="旋转">&#8635;</button>
+        <button type="button" class="tp" data-act="right" aria-label="右移">&rarr;</button>
+        <button type="button" class="tp" data-act="down" aria-label="加速下落">&darr;</button>
+        <button type="button" class="tp tp-drop" data-act="drop" aria-label="直接落底">&#10515;</button>
+      </div>
+
+      <p class="play-tip">电脑：← → 或 A D 移动，↑ 或 W 旋转，↓ 加速，S 或空格直接落底，P 暂停<br>手机：点棋盘旋转，左右拖动移动，向下拖动加速，快速下划直接落底，也可使用下方按键</p>
+    </main>
+
+    <footer class="footer">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2022072679号-1</a>
+    </footer>
+  </div>
+
+  <script src="js/tetris.js?v=2"></script>
+</body>
+</html>

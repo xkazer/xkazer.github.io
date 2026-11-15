@@ -18,7 +18,10 @@
     { name: '文件对比', href: 'diff.html' }
   ];
   var FUN = [
-    { name: '红白机ROM加载', href: 'nes.html' }
+    { name: '红白机ROM加载', href: 'nes.html' },
+    { name: '2048', href: '2048.html' },
+    { name: '贪食蛇', href: 'snake.html' },
+    { name: '俄罗斯方块', href: 'tetris.html' }
   ];
   var ENGINES = {
     baidu: 'https://www.baidu.com/s?wd=',

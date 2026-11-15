@@ -1,0 +1,61 @@
+.g2048-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background: #cfe0fa;
+  box-shadow: inset 0 0 0 1px #bcd3f6;
+}
+
+.g2048-cell,
+.g2048-tile {
+  position: absolute;
+  width: 21.25%;
+  height: 21.25%;
+}
+
+.g2048-cell {
+  border-radius: 8px;
+  background: #e6f0fe;
+}
+
+.g2048-tile {
+  transition: left .11s ease-in-out, top .11s ease-in-out;
+}
+
+.g2048-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: calc(var(--fs, 32px) * 1);
+  color: var(--blue-900);
+  background: #eaf2ff;
+  box-shadow: 0 2px 6px rgba(20, 87, 217, .18);
+}
+
+.g2048-inner.len3 { font-size: calc(var(--fs, 32px) * .85); }
+.g2048-inner.len4 { font-size: calc(var(--fs, 32px) * .7); }
+.g2048-inner.len5 { font-size: calc(var(--fs, 32px) * .55); }
+
+.g2048-inner.appear { animation: g2048-appear .18s ease-out; }
+.g2048-inner.pop { animation: g2048-pop .18s ease-out; }
+
+@keyframes g2048-appear { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes g2048-pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+.g2048-inner.v2    { background: #eaf2ff; color: #0d3a9e; }
+.g2048-inner.v4    { background: #d3e5ff; color: #0d3a9e; }
+.g2048-inner.v8    { background: #a9c9fb; color: #0d3a9e; }
+.g2048-inner.v16   { background: #7fb0f7; color: #fff; }
+.g2048-inner.v32   { background: #5a97f2; color: #fff; }
+.g2048-inner.v64   { background: #2f7cf0; color: #fff; }
+.g2048-inner.v128  { background: #1f68dd; color: #fff; }
+.g2048-inner.v256  { background: #1457d9; color: #fff; }
+.g2048-inner.v512  { background: #0f47b8; color: #fff; }
+.g2048-inner.v1024 { background: #0d3a9e; color: #fff; }
+.g2048-inner.v2048 { background: linear-gradient(180deg, #ffd45a, #f2a516); color: #fff; box-shadow: 0 0 14px rgba(242, 165, 22, .6); }
+.g2048-inner.vsuper { background: linear-gradient(180deg, #ff9d4d, #e8630c); color: #fff; }
