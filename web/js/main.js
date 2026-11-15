@@ -144,13 +144,6 @@
     $('maximSource').textContent = item && item.source ? '—— ' + item.source : '';
   }
 
-  // 按日期固定选取"今日格言"
-  function pickToday() {
-    var d = new Date();
-    var seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-    return maximAll[seed % maximAll.length];
-  }
-
   function pickRandom() {
     if (maximAll.length < 2) return maximAll[0];
     var item;
@@ -238,7 +231,7 @@
         maximAll = [];
         renderMaximList(data);
         if (!maximAll.length) throw new Error('empty');
-        showMaxim(pickToday());
+        showMaxim(pickRandom());
       })
       .catch(function () {
         maximLoaded = false;
