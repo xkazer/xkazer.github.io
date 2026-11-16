@@ -124,7 +124,7 @@ button {
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   border-bottom: 1px solid #dde8f8;
 }
 
@@ -303,4 +303,6 @@ button {
 @media (max-width: 420px) {
   .search-box { padding-left: 12px; }
   .engine { padding: 6px 5px; }
+  .tab { font-size: 16px; }
+  .tab.active::after { width: 40px; margin-left: -20px; }
 }

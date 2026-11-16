@@ -23,12 +23,15 @@
     { name: '贪食蛇', href: 'snake.html' },
     { name: '俄罗斯方块', href: 'tetris.html' }
   ];
+  var SCENES = [
+    { name: '孤岛 · 月夜', href: '3d/island-moon.html' }
+  ];
   var ENGINES = {
     baidu: 'https://www.baidu.com/s?wd=',
     bing: 'https://www.bing.com/search?q=',
     google: 'https://www.google.com/search?q='
   };
-  var TABS = ['tools', 'fun', 'maxim'];
+  var TABS = ['tools', 'fun', 'scene', 'maxim'];
   var MAXIM_URL = 'maxim/maxim.json';
 
   function $(id) { return document.getElementById(id); }
@@ -251,6 +254,7 @@
   // ===== 启动 =====
   renderCards($('toolsGrid'), TOOLS);
   renderCards($('funGrid'), FUN);
+  renderCards($('sceneGrid'), SCENES);
   initSearch();
   initMaxim();
   initTabs();
