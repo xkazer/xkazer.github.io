@@ -378,6 +378,11 @@ window.HOME = window.HOME || {};
     var canvas = null;
     var sens = 0.0022;
 
+    // 触屏：左下虚拟摇杆（x 右 / y 前，长度 0~1）+ 画布拖拽转视角
+    var stick = { x: 0, y: 0 };
+    var touchId = null, touchX = 0, touchY = 0;
+    var TOUCH_SENS = 0.0042;
+
     function onKey(e, down) {
       var a = KEYS[e.code];
       if (!a) return;
@@ -403,7 +408,12 @@ window.HOME = window.HOME || {};
 
       canvas.addEventListener('click', function () {
         H.Audio.unlock();
-        if (!pointerLocked && canvas.requestPointerLock) canvas.requestPointerLock();
+        // 触屏没有指针锁，拖拽转视角就够了
+        if (pointerLocked || touchId !== null) return;
+        if (matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+        if (canvas.requestPointerLock) {
+          try { canvas.requestPointerLock(); } catch (err) { /* 不支持则忽略 */ }
+        }
       });
 
       document.addEventListener('pointerlockchange', function () {
@@ -425,10 +435,38 @@ window.HOME = window.HOME || {};
       // 指针锁被拒时的拖拽回退
       canvas.addEventListener('pointerdown', function (e) {
         H.Audio.unlock();
-        if (!pointerLocked) { dragging = true; lastX = e.clientX; lastY = e.clientY; }
+        if (pointerLocked) return;
+        if (e.pointerType === 'touch') {
+          if (touchId !== null) return;
+          touchId = e.pointerId;
+          touchX = e.clientX; touchY = e.clientY;
+          try { canvas.setPointerCapture(e.pointerId); } catch (err2) { /* 忽略 */ }
+        } else {
+          dragging = true; lastX = e.clientX; lastY = e.clientY;
+        }
       });
-      window.addEventListener('pointerup', function () { dragging = false; });
+
+      // 触屏转视角：pointermove 才会在触摸时触发（mousemove 不会）
+      canvas.addEventListener('pointermove', function (e) {
+        if (pointerLocked || dragging) return;
+        if (e.pointerType !== 'touch' || e.pointerId !== touchId) return;
+        look.dx += (e.clientX - touchX) * TOUCH_SENS;
+        look.dy += (e.clientY - touchY) * TOUCH_SENS;
+        touchX = e.clientX; touchY = e.clientY;
+      }, { passive: true });
+
+      function endTouch(e) {
+        if (e.pointerId === touchId) touchId = null;
+      }
+      canvas.addEventListener('pointerup', endTouch);
+      canvas.addEventListener('pointercancel', endTouch);
+      window.addEventListener('pointerup', function (e) {
+        dragging = false;
+        endTouch(e);
+      });
     }
+
+    var lastMag = 0;
 
     return {
       bind: bind,
@@ -436,19 +474,29 @@ window.HOME = window.HOME || {};
       pressed: function (a) { return !!fresh[a]; },
       look: look,
       endFrame: function () { fresh = {}; look.dx = 0; look.dy = 0; },
+      // 虚拟摇杆：x 右正、y 前正，模长 > 1 时归一化（超出半径视为推满）
+      setStick: function (x, y) {
+        if (!isFinite(x) || !isFinite(y)) { stick.x = stick.y = 0; return; }
+        stick.x = H.clamp(x, -1, 1);
+        stick.y = H.clamp(y, -1, 1);
+      },
+      stickActive: function () { return stick.x !== 0 || stick.y !== 0; },
       moveAxis: function () {
-        var x = 0, y = 0;
+        var x = stick.x, y = stick.y;
         if (held.forward) y += 1;
         if (held.back) y -= 1;
         if (held.right) x += 1;
         if (held.left) x -= 1;
         var len = Math.sqrt(x * x + y * y);
+        lastMag = Math.min(1, len);
         if (len > 1) { x /= len; y /= len; }
         return { x: x, y: y };
       },
+      // 本帧输入的力度（0~1）：键盘推满为 1，摇杆可半推
+      mag: function () { return lastMag; },
       isLocked: function () { return pointerLocked; },
       exitLock: function () { if (document.exitPointerLock) document.exitPointerLock(); },
-      release: function () { held = {}; }
+      release: function () { held = {}; stick.x = stick.y = 0; }
     };
   })();
 

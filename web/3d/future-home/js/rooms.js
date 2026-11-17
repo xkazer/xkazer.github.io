@@ -1788,7 +1788,10 @@
     var tileMat = new T.MeshStandardMaterial({
       map: tileTex(5), color: 0xffffff, roughness: 0.32, metalness: 0.03
     });
-    var shellMat = new T.MeshStandardMaterial({ color: 0xe8e5df, roughness: 0.5, metalness: 0.05 });
+    var shellMat = new T.MeshStandardMaterial({
+      color: 0xe8e5df, roughness: 0.5, metalness: 0.05,
+      emissive: 0xf2ece2, emissiveIntensity: 0.12   // 门厅侧背光，补一点自发光免得掉成一片蓝
+    });
     var porcelain = new T.MeshStandardMaterial({ color: 0xf7fafd, roughness: 0.16, metalness: 0.04 });
     // 没有环境贴图时 metalness 过高会直接变黑，压到 0.4 才是镀铬的观感
     var chrome = new T.MeshStandardMaterial({ color: 0xe6edf5, roughness: 0.34, metalness: 0.30 });
@@ -1808,7 +1811,9 @@
     // 南隔墙：门洞两侧 + 门楣
     scene.add(H.box(DX0 - (X0 - WT2), 3.2, WT2, shellMat, (X0 - WT2 + DX0) / 2, 1.6, Z1 + WT2 / 2));
     scene.add(H.box(X1 - DX1, 3.2, WT2, shellMat, (DX1 + X1) / 2, 1.6, Z1 + WT2 / 2));
-    scene.add(H.box(DX1 - DX0, 3.2 - DH, WT2, shellMat, (DX0 + DX1) / 2, DH + (3.2 - DH) / 2, Z1 + WT2 / 2));
+    var bathLintel = H.box(DX1 - DX0, 3.2 - DH, WT2, shellMat, (DX0 + DX1) / 2, DH + (3.2 - DH) / 2, Z1 + WT2 / 2);
+    bathLintel.castShadow = false;   // 门楣投影会在门洞上方压出一条黑带
+    scene.add(bathLintel);
     H.physics.add(X0 - WT2, Z1, DX0, Z1 + WT2, 0, 3.2, 'bath-wall');
     H.physics.add(DX1, Z1, X1, Z1 + WT2, 0, 3.2, 'bath-wall');
     H.physics.add(DX0, Z1, DX1, Z1 + WT2, DH, 3.2, 'bath-wall');
@@ -1817,6 +1822,15 @@
     scene.add(H.box(0.05, DH, 0.14, chrome, DX0 + 0.025, DH / 2, Z1 + WT2 / 2));
     scene.add(H.box(0.05, DH, 0.14, chrome, DX1 - 0.025, DH / 2, Z1 + WT2 / 2));
     scene.add(H.box(DX1 - DX0, 0.05, 0.14, chrome, (DX0 + DX1) / 2, DH - 0.025, Z1 + WT2 / 2));
+    // 门洞上口内衬：朝下的面接不到光会发黑，铺一块微亮板
+    var soffitMat = new T.MeshStandardMaterial({
+      color: 0xf2ece2, roughness: 0.72, metalness: 0.02,
+      emissive: 0xf7efe2, emissiveIntensity: 0.46
+    });
+    var bathSoffit = H.box(DX1 - DX0 - 0.02, 0.018, WT2, soffitMat,
+      (DX0 + DX1) / 2, DH - 0.059, Z1 + WT2 / 2);
+    bathSoffit.castShadow = false; bathSoffit.receiveShadow = false;
+    scene.add(bathSoffit);
 
     // 磨砂玻璃自动移门（走近自动滑进墙里）
     var doorGlass = new T.MeshStandardMaterial({
@@ -2291,8 +2305,10 @@
       (CX0 - WT3 + DW0) / 2, 1.6, WZ));
     scene.add(H.box((CX1 + WT3) - DW1, 3.2, WT3, cream,
       (DW1 + CX1 + WT3) / 2, 1.6, WZ));
-    scene.add(H.box(DW1 - DW0, 3.2 - DH3, WT3, cream,
-      (DW0 + DW1) / 2, DH3 + (3.2 - DH3) / 2, WZ));
+    var careLintel = H.box(DW1 - DW0, 3.2 - DH3, WT3, cream,
+      (DW0 + DW1) / 2, DH3 + (3.2 - DH3) / 2, WZ);
+    careLintel.castShadow = false;
+    scene.add(careLintel);
     H.physics.add(CX0 - WT3, WZ - WT3 / 2, DW0, WZ + WT3 / 2, 0, 3.2, 'care-wall');
     H.physics.add(DW1, WZ - WT3 / 2, CX1 + WT3, WZ + WT3 / 2, 0, 3.2, 'care-wall');
     H.physics.add(DW0, WZ - WT3 / 2, DW1, WZ + WT3 / 2, DH3, 3.2, 'care-wall');
@@ -2302,6 +2318,14 @@
     scene.add(H.box(0.05, DH3, 0.10, trim, DW1 - 0.025, DH3 / 2, WZ - 0.01));
     scene.add(H.box(DW1 - DW0, 0.05, 0.10, trim, (DW0 + DW1) / 2, DH3 - 0.025, WZ - 0.01));
     scene.add(H.glowStrip(DW1 - DW0 - 0.06, 0.012, 0.012, (DW0 + DW1) / 2, DH3 - 0.06, WZ - 0.055, warmGlow));
+    var careSoffit = H.box(DW1 - DW0 - 0.02, 0.018, WT3, H.mats.softWhite || trim,
+      (DW0 + DW1) / 2, DH3 - 0.059, WZ);
+    careSoffit.material = new T.MeshStandardMaterial({
+      color: 0xf3eee5, roughness: 0.72, metalness: 0.02,
+      emissive: 0xf7efe2, emissiveIntensity: 0.40
+    });
+    careSoffit.castShadow = false; careSoffit.receiveShadow = false;
+    scene.add(careSoffit);
 
     // 磨砂自动移门：走近滑进西侧墙里
     H.buildAutoDoor({

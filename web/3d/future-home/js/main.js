@@ -13,10 +13,19 @@
   var bootBar = document.getElementById('bootBar');
   var bootTip = document.getElementById('bootTip');
   var lockEl = document.getElementById('lock');
+  var stickEl = document.getElementById('stick');
+  var knobEl = document.getElementById('stickKnob');
+  var actBtn = document.getElementById('actBtn');
+  var pauseEl = document.getElementById('pause');
   var zoneEl = document.getElementById('zone');
   var hintEl = document.getElementById('hint');
   var fpsEl = document.getElementById('fps');
   var modeEl = document.getElementById('mode');
+
+  // 触屏设备（手机 / 平板）：没有键盘，走虚拟摇杆 + 拖拽转视角
+  // 用 hover/pointer 媒体查询判断，避免带触摸屏的笔记本也被塞摇杆
+  var isTouch = !!(window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+  if (isTouch) document.body.classList.add('touch');
 
   if (!window.THREE) {
     bootEl.innerHTML = '<div class="boot-tip">three.js 加载失败</div>';
@@ -129,11 +138,13 @@
     activeInteract = best;
 
     if (best) {
-      hintEl.innerHTML = '<b>E</b> ' + best.label;
+      if (isTouch) hintEl.textContent = best.label;
+      else hintEl.innerHTML = '<b>E</b> ' + best.label;
       hintEl.classList.add('show');
     } else {
       hintEl.classList.remove('show');
     }
+    if (actBtn) actBtn.classList.toggle('show', !!best);
   }
 
   function doInteract() {
@@ -209,14 +220,16 @@
   function updatePlayer(dt) {
     if (WALK.active) { updateWalkIn(dt); return; }
     if (!WALK.done) { syncCamera(); return; }   // 未点击开始前不响应移动
+    if (paused) { syncCamera(); return; }       // 暂停时角色不动，只保留画面
 
     var look = H.Input.look;
     player.yaw -= look.dx;
     player.pitch = H.clamp(player.pitch - look.dy, -1.35, 1.35);
 
     var axis = H.Input.moveAxis();
-    var sprint = H.Input.down('sprint');
-    var maxSpeed = sprint ? SPEED.sprint : SPEED.walk;
+    var mag = H.Input.mag();                    // 摇杆可半推，键盘恒为 1
+    var sprint = H.Input.down('sprint') || mag > 0.94;
+    var maxSpeed = (sprint ? SPEED.sprint : SPEED.walk) * mag;
 
     var fx = -Math.sin(player.yaw), fz = -Math.cos(player.yaw);
     var rx = Math.cos(player.yaw), rz = -Math.sin(player.yaw);
@@ -313,28 +326,121 @@
   /* ============================ 事件绑定 ============================ */
   H.Input.bind(canvas);
 
-  function requestLock() {
-    H.Audio.unlock();
-    startWalkIn();
-    if (canvas.requestPointerLock) {
-      var p = canvas.requestPointerLock();
-      if (p && p.catch) p.catch(function () { /* 被拒绝时用拖拽 */ });
+  /* ---- 触屏：左下虚拟摇杆 ---- */
+  if (stickEl && knobEl) {
+    var stickId = null, scx = 0, scy = 0;
+    var SR = 40;                                  // 摇杆最大位移（px），约等于底盘半径
+
+    function moveStick(e) {
+      var dx = e.clientX - scx, dy = e.clientY - scy;
+      var len = Math.sqrt(dx * dx + dy * dy);
+      if (len > SR) { dx = dx / len * SR; dy = dy / len * SR; }
+      knobEl.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
+      // 屏幕向上 = 前进，所以 y 轴取反
+      H.Input.setStick(dx / SR, -dy / SR);
     }
+
+    stickEl.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      if (stickId !== null) return;
+      stickId = e.pointerId;
+      var r = stickEl.getBoundingClientRect();
+      scx = r.left + r.width / 2;
+      scy = r.top + r.height / 2;
+      try { stickEl.setPointerCapture(stickId); } catch (err) { /* 忽略 */ }
+      moveStick(e);
+    }, { passive: false });
+
+    stickEl.addEventListener('pointermove', function (e) {
+      if (e.pointerId !== stickId) return;
+      e.preventDefault();
+      moveStick(e);
+    }, { passive: false });
+
+    function endStick(e) {
+      if (e.pointerId !== stickId) return;
+      stickId = null;
+      knobEl.style.transform = 'translate(0px,0px)';
+      H.Input.setStick(0, 0);
+    }
+    stickEl.addEventListener('pointerup', endStick);
+    stickEl.addEventListener('pointercancel', endStick);
+    stickEl.addEventListener('lostpointercapture', endStick);
+  }
+
+  if (actBtn) {
+    actBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      doInteract();
+    });
+  }
+
+  if (isTouch) {
+    var lockP = lockEl.querySelector('p');
+    if (lockP) lockP.innerHTML = '点击开始 · 左下摇杆移动<br>拖动屏幕转视角 · 靠近物件点右下按钮交互';
+    var keysEl = document.querySelector('.keys');
+    if (keysEl) keysEl.textContent = '左下摇杆移动 · 拖动屏幕转视角 · 右下按钮交互';
+  }
+
+  var started = false;          // 是否已经进入过场景
+  var paused = false;           // 指针锁被释放（Esc / 失焦）时为 true
+
+  // hideBack：真的锁住指针（鼠标不可见）时才收起右上角返回按钮；
+  // 触屏 / 指针锁不可用时鼠标一直可见，按钮要留着
+  function enterPlay(hideBack) {
+    started = true;
+    paused = false;
+    document.body.classList.toggle('playing', hideBack !== false);
+    if (pauseEl) pauseEl.classList.remove('show');
     lockEl.classList.add('hidden');
   }
 
+  function enterPause() {
+    if (!started) return;
+    paused = true;
+    document.body.classList.remove('playing');   // 恢复显示返回按钮，此时鼠标可见可点
+    if (pauseEl) pauseEl.classList.add('show');
+    H.Input.release();                           // 暂停时清掉按键，免得恢复后角色自己走
+  }
+
+  function requestLock() {
+    H.Audio.unlock();
+    if (!started) startWalkIn();
+    lockEl.classList.add('hidden');
+    if (isTouch || !canvas.requestPointerLock) {
+      enterPlay(false);                          // 触屏没有指针锁，直接算进入，但保留返回按钮
+      return;
+    }
+    try {
+      var p = canvas.requestPointerLock();
+      if (p && p.catch) p.catch(function () { enterPlay(false); });
+    } catch (err) {
+      enterPlay(false);                          // 被浏览器拒绝时退回拖拽转视角
+    }
+  }
+
   lockEl.addEventListener('click', requestLock);
+  if (pauseEl) {
+    pauseEl.addEventListener('click', function (e) {
+      e.preventDefault();
+      requestLock();
+    });
+  }
 
   H.on('lock', function (locked) {
-    lockEl.classList.toggle('hidden', locked);
-    if (locked) H.Audio.click(720);
+    if (locked) {
+      enterPlay();
+      H.Audio.click(720);
+    } else {
+      enterPause();
+    }
   });
 
   H.on('key', function (code) {
     if (code === 'KeyE') doInteract();
     if (code === 'Escape') {
       H.Input.exitLock();
-      lockEl.classList.remove('hidden');
+      enterPause();                              // 指针锁不支持时也能进暂停态
     }
   });
 

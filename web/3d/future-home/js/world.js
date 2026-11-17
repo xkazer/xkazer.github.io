@@ -440,7 +440,7 @@
 
   /* ============================ 房间自动感应门 ============================ */
   // 通用双扇/单扇推拉门：走近自动滑开，滑进墙里的"口袋"，不占门口空间
-  // o = { x, z, w, h, dir:'z'|'x', leaves:1|2, thick, panel, frame, track, sensor, range }
+  // o = { x, z, w, h, dir:'z'|'x', leaves:1|2, thick, panel, frame, track, range }
   H.autoDoors = H.autoDoors || [];
   H.buildAutoDoor = function (o) {
     var scene = H.scene, mats = H.mats;
@@ -466,7 +466,7 @@
       color: 0xeef3f8, roughness: 0.28, metalness: 0.34
     });
     var handleMat = new T.MeshStandardMaterial({
-      color: 0x71818e, roughness: 0.38, metalness: 0.5
+      color: 0xa9b7c3, roughness: 0.42, metalness: 0.2
     });
     var stripMat = new T.MeshBasicMaterial({ color: 0x9fe4ff });
     var trackMat = new T.MeshStandardMaterial({
@@ -510,16 +510,6 @@
 
     // 地轨
     if (o.track !== false) g.add(H.box(w, 0.008, 0.04, trackMat, 0, 0.005, 0));
-    // 门侧感应面板：贴在门洞旁的墙面上（走廊侧），门开为绿、门关为红
-    var lampMat = new T.MeshBasicMaterial({ color: 0xff6a5e });
-    if (o.sensor !== false) {
-      var mz = thick / 2 + 0.018;
-      g.add(H.box(0.072, 0.115, 0.016, frameMat, w / 2 + 0.118, 1.16, mz));
-      var lamp = new T.Mesh(new T.SphereGeometry(0.017, 12, 10), lampMat);
-      lamp.position.set(w / 2 + 0.118, 1.19, mz + 0.011);
-      g.add(lamp);
-      g.add(H.box(0.030, 0.006, 0.006, handleMat, w / 2 + 0.118, 1.115, mz + 0.010));
-    }
 
     // 碰撞盒：按门扇当前位置同步
     function aabb(lx) {
@@ -540,6 +530,8 @@
         var near = api.dist < range;
         var prev = state.open;
         state.open = H.damp(state.open, near ? 1 : 0, 5.0, dt);
+        // 关门时更磨砂一点，门的存在感更明确
+        panelMat.opacity = 0.52 + (1 - state.open) * 0.30;
         if (prev < 0.02 && state.open >= 0.02) H.Audio.door(true);
         if (prev > 0.98 && state.open <= 0.98) H.Audio.door(false);
 
@@ -556,7 +548,6 @@
           d.box.minX = b.x0; d.box.maxX = b.x1;
           d.box.minZ = b.z0; d.box.maxZ = b.z1;
         }
-        lampMat.color.setHex(state.open > 0.5 ? 0x49f0a8 : 0xff6a5e);
       },
       isOpen: function () { return state.open; },
       position: { x: cx, z: cz }
