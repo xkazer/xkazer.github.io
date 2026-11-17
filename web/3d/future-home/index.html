@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>未来家居 · 2086</title>
+<style>
+  :root {
+    --ink: #05070c;
+    --bone: #e9eef6;
+    --bone-dim: rgba(233, 238, 246, .56);
+    --cyan: #6fe8ff;
+    --amber: #ffca7a;
+    --line: rgba(233, 238, 246, .15);
+    --sat: env(safe-area-inset-top, 0px);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--ink); overflow: hidden; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif;
+    color: var(--bone); -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent;
+  }
+  #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+
+  #ui { position: fixed; inset: 0; pointer-events: none; user-select: none; }
+
+  /* ---------- 顶部 ---------- */
+  .topbar {
+    position: absolute; left: max(20px, env(safe-area-inset-left)); top: calc(18px + var(--sat));
+    right: max(18px, env(safe-area-inset-right));
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand .mark {
+    font-size: clamp(20px, 2.6vw, 30px); font-weight: 800; letter-spacing: .2em;
+    text-shadow: 0 0 22px rgba(110, 210, 255, .35);
+  }
+  .brand .sub { font-size: 10px; letter-spacing: .32em; color: var(--bone-dim); text-transform: uppercase; }
+
+  .back {
+    pointer-events: auto; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 15px; border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(8, 12, 20, .45);
+    backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    color: var(--bone-dim); font-size: 12px; letter-spacing: .12em;
+    transition: border-color .25s, background .25s, color .25s;
+  }
+  .back:hover { color: var(--bone); border-color: rgba(233, 238, 246, .34); background: rgba(12, 18, 28, .7); }
+
+  /* ---------- 准星 ---------- */
+  .crosshair {
+    position: absolute; left: 50%; top: 50%; width: 5px; height: 5px;
+    margin: -2.5px 0 0 -2.5px; border-radius: 50%;
+    background: rgba(255, 255, 255, .6);
+    box-shadow: 0 0 8px rgba(120, 220, 255, .8);
+    transition: opacity .2s;
+  }
+
+  /* ---------- 区域提示 ---------- */
+  #zone {
+    position: absolute; left: 50%; top: 15%; transform: translate(-50%, -8px);
+    padding: 9px 22px; border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(8, 14, 22, .55);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    font-size: 14px; letter-spacing: .22em; color: rgba(220, 240, 255, .9);
+    opacity: 0; transition: opacity .45s, transform .45s;
+  }
+  #zone.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- 底部 ---------- */
+  .bottom {
+    position: absolute; left: 50%; bottom: calc(26px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    width: min(760px, calc(100% - 32px)); text-align: center;
+  }
+  #hint {
+    min-height: 34px; display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 18px; border-radius: 999px;
+    border: 1px solid rgba(111, 232, 255, .35);
+    background: rgba(10, 22, 32, .6);
+    color: #cdf3ff; font-size: 13px; letter-spacing: .08em;
+    opacity: 0; transition: opacity .2s;
+  }
+  #hint.show { opacity: 1; }
+  #hint b {
+    display: inline-block; padding: 1px 7px; border-radius: 5px;
+    background: rgba(111, 232, 255, .18); color: #eaffff; font-weight: 700;
+  }
+  .keys { font-size: 11.5px; letter-spacing: .1em; color: rgba(220, 235, 250, .42); }
+
+  /* ---------- 右上角状态 ---------- */
+  .stat {
+    position: absolute; right: max(18px, env(safe-area-inset-right)); bottom: calc(26px + env(safe-area-inset-bottom));
+    font-size: 10px; letter-spacing: .18em; color: rgba(233, 238, 246, .28);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- 指针锁提示 ---------- */
+  #lock {
+    position: fixed; inset: 0; z-index: 12; cursor: pointer;
+    display: grid; place-items: center; text-align: center;
+    background: radial-gradient(60% 60% at 50% 45%, rgba(4, 10, 18, .35), rgba(4, 8, 14, .82));
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    transition: opacity .3s;
+  }
+  #lock.hidden { opacity: 0; pointer-events: none; }
+  .lock-mark { font-size: clamp(20px, 3vw, 30px); font-weight: 800; letter-spacing: .3em; }
+  #lock p { margin: 14px 0 0; font-size: 12.5px; letter-spacing: .16em; color: var(--bone-dim); line-height: 2; }
+  #lock .cta {
+    display: inline-block; margin-top: 22px; padding: 11px 26px; border-radius: 999px;
+    border: 1px solid rgba(111, 232, 255, .45); color: #d6f6ff;
+    background: rgba(12, 30, 44, .6); font-size: 13px; letter-spacing: .18em;
+  }
+
+  /* ---------- 启动 ---------- */
+  #boot {
+    position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
+    background: #05070c; transition: opacity .8s ease; padding: 24px; text-align: center;
+  }
+  #boot.done { opacity: 0; pointer-events: none; }
+  .boot-mark { font-size: clamp(20px, 3vw, 28px); font-weight: 800; letter-spacing: .28em; }
+  .boot-sub { margin-top: 10px; font-size: 10px; letter-spacing: .32em; color: rgba(233, 238, 246, .38); text-transform: uppercase; }
+  .boot-bar {
+    width: 220px; height: 2px; margin: 26px auto 0; background: rgba(255, 255, 255, .1); overflow: hidden;
+  }
+  .boot-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #4fb8ff, #8ff6ff); transition: width .3s; }
+  .boot-tip { margin-top: 14px; font-size: 11px; letter-spacing: .2em; color: rgba(233, 238, 246, .45); min-height: 1.4em; }
+
+  @media (max-width: 640px) {
+    .keys { display: none; }
+    .brand .sub { display: none; }
+    #zone { top: 12%; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="view" tabindex="0"></canvas>
+
+<div id="ui">
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark">未来家居</span>
+      <span class="sub">Future Home · 2086</span>
+    </div>
+    <a class="back" href="../../index.html#scene">← 返回幻境</a>
+  </div>
+
+  <div class="crosshair" id="crosshair"></div>
+  <div id="zone"></div>
+
+  <div class="bottom">
+    <div id="hint"></div>
+    <div class="keys">WASD 移动 · 鼠标 环顾 · Shift 加速 · E 交互 · Esc 释放鼠标</div>
+  </div>
+
+  <div class="stat"><span id="fps"></span> · <span id="mode"></span></div>
+</div>
+
+<div id="lock">
+  <div>
+    <div class="lock-mark">未来家居</div>
+    <p>点击开始 · 会自动带你走进屋内<br>进屋后用 WASD 自由行走</p>
+    <div class="cta">点击开始</div>
+  </div>
+</div>
+
+<div id="boot"><div>
+  <div class="boot-mark">未来家居</div>
+  <div class="boot-sub">Future Home Prototype</div>
+  <div class="boot-bar"><i id="bootBar"></i></div>
+  <div class="boot-tip" id="bootTip">正在初始化…</div>
+</div></div>
+
+<script src="../three.slim.r180.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/world.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

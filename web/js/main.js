@@ -24,7 +24,8 @@
     { name: '俄罗斯方块', href: 'tetris.html' }
   ];
   var SCENES = [
-    { name: '孤岛 · 月夜', href: '3d/island-moon.html' }
+    { name: '孤岛 · 月夜', href: '3d/island-moon.html' },
+    { name: '未来家居 · 2086', href: '3d/future-home/index.html' }
   ];
   var ENGINES = {
     baidu: 'https://www.baidu.com/s?wd=',
