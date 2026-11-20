@@ -63,6 +63,7 @@
     ['正在打磨卫生间', function () { rooms.bath = H.buildBath(); }],
     ['正在布置康养室', function () { rooms.care = H.buildCare(); }],
     ['正在唤醒家务机器人', function () { rooms.robot = H.buildRobot(); }],
+    ['正在收口墙面细节', function () { H.buildArchDetail(); }],
     ['正在准备首帧画面', function () { prepare(); }]
   ];
 

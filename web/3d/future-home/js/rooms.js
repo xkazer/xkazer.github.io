@@ -1101,13 +1101,14 @@
     desk.add(H.box(0.05, DK_H, DK_D - 0.04, mats.darkMetal, DK_W / 2 - 0.06, DK_H / 2, 0));
     desk.add(H.box(DK_W - 0.2, 0.04, DK_D - 0.1, mats.darkMetal, 0, 0.30, 0));         // 下层隔板
     desk.add(H.box(DK_W - 0.2, 0.24, 0.03, mats.darkMetal, 0, DK_H - 0.14, -DK_D / 2 + 0.02)); // 挡板
-    // 显示器（挂墙式，带支架）
+    // 显示器：桌面支架式，屏面朝 +z（房间/座椅一侧），支架在屏后靠墙
     var monMat = new T.MeshStandardMaterial({ color: 0x0d1117, roughness: 0.42, metalness: 0.5 });
-    desk.add(H.box(0.86, 0.50, 0.035, monMat, 0.06, 1.20, -DK_D / 2 + 0.30));
+    var MON_Z = -DK_D / 2 + 0.16;                                                   // 面板所在进深
+    desk.add(H.box(0.26, 0.02, 0.16, mats.darkMetal, 0.06, 0.775, MON_Z - 0.05));   // 底座（贴桌面）
+    desk.add(H.box(0.06, 0.30, 0.06, mats.darkMetal, 0.06, 0.93, MON_Z - 0.05));    // 支架柱（在屏后）
+    desk.add(H.box(0.86, 0.50, 0.035, monMat, 0.06, 1.20, MON_Z));                  // 面板本体
     desk.add(H.box(0.78, 0.42, 0.004, new T.MeshBasicMaterial({ color: 0x6fe8ff, transparent: true, opacity: 0.10 }),
-      0.06, 1.20, -DK_D / 2 + 0.28));
-    desk.add(H.box(0.06, 0.30, 0.06, mats.darkMetal, 0.06, 0.92, -DK_D / 2 + 0.32));
-    desk.add(H.box(0.26, 0.02, 0.16, mats.darkMetal, 0.06, 0.785, -DK_D / 2 + 0.32));
+      0.06, 1.20, MON_Z + 0.021));                                                  // 屏面（朝房间）
     // 台灯
     desk.add(H.box(0.10, 0.02, 0.10, mats.darkMetal, -0.62, DK_H + 0.03, -DK_D / 2 + 0.22));
     desk.add(H.box(0.02, 0.26, 0.02, mats.darkMetal, -0.62, DK_H + 0.16, -DK_D / 2 + 0.22));
@@ -1782,19 +1783,20 @@
       t.repeat.set(n, n);
       return t;
     }
+    // 纯白 + 强灯光会直接过曝成一片糊，基色压到浅灰，靠环境反射还原「白瓷砖」
     var floorMat = new T.MeshStandardMaterial({
-      map: tileTex(4), color: 0xffffff, roughness: 0.22, metalness: 0.06
+      map: tileTex(4), color: 0xc8d2dc, roughness: 0.16, metalness: 0.10, envMapIntensity: 1.3
     });
     var tileMat = new T.MeshStandardMaterial({
-      map: tileTex(5), color: 0xffffff, roughness: 0.32, metalness: 0.03
+      map: tileTex(5), color: 0xccd5de, roughness: 0.26, metalness: 0.05, envMapIntensity: 0.9
     });
     var shellMat = new T.MeshStandardMaterial({
-      color: 0xe8e5df, roughness: 0.5, metalness: 0.05,
-      emissive: 0xf2ece2, emissiveIntensity: 0.12   // 门厅侧背光，补一点自发光免得掉成一片蓝
+      color: 0xd5d2cc, roughness: 0.5, metalness: 0.05, envMapIntensity: 0.6,
+      emissive: 0xf2ece2, emissiveIntensity: 0.08   // 门厅侧背光，补一点自发光免得掉成一片蓝
     });
-    var porcelain = new T.MeshStandardMaterial({ color: 0xf7fafd, roughness: 0.16, metalness: 0.04 });
-    // 没有环境贴图时 metalness 过高会直接变黑，压到 0.4 才是镀铬的观感
-    var chrome = new T.MeshStandardMaterial({ color: 0xe6edf5, roughness: 0.34, metalness: 0.30 });
+    var porcelain = new T.MeshStandardMaterial({ color: 0xdfe8f2, roughness: 0.12, metalness: 0.05, envMapIntensity: 1.4 });
+    // 有了环境贴图，镀铬可以真的金属化
+    var chrome = new T.MeshStandardMaterial({ color: 0xdce6f0, roughness: 0.14, metalness: 0.92, envMapIntensity: 1.8 });
     var glassMat = new T.MeshStandardMaterial({
       color: 0xdff2ff, transparent: true, opacity: 0.18,
       roughness: 0.04, metalness: 0.2, depthWrite: false
@@ -2253,8 +2255,8 @@
     var WZ = CZ1 + WT3 / 2;                     // 南墙中心 -4.36
 
     /* ---- 材质 ---- */
-    var cream = new T.MeshStandardMaterial({ color: 0xf1ece3, roughness: 0.86, metalness: 0.02 });
-    var creamDeep = new T.MeshStandardMaterial({ color: 0xdfd8cc, roughness: 0.9, metalness: 0.02 });
+    var cream = new T.MeshStandardMaterial({ color: 0xd8d2c7, roughness: 0.8, metalness: 0.06, envMapIntensity: 0.55 });
+    var creamDeep = new T.MeshStandardMaterial({ color: 0xc3bcae, roughness: 0.86, metalness: 0.05, envMapIntensity: 0.5 });
     var podShell = new T.MeshStandardMaterial({ color: 0xf8f9fb, roughness: 0.32, metalness: 0.08 });
     var podShell2 = new T.MeshStandardMaterial({ color: 0xeceff4, roughness: 0.44, metalness: 0.05 });
     var trim = new T.MeshStandardMaterial({ color: 0xdfe6ee, roughness: 0.26, metalness: 0.36 });
