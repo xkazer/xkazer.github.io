@@ -75,10 +75,16 @@ window.HOME = window.HOME || {};
 
   /* ============================ 2. 画质档位 ============================ */
   // detail：0 关闭细节几何 / 1 中等 / 2 全开；aniso：各向异性过滤上限；env：环境反射立方图分辨率
+  // lights：同时在场景里的点光源槽位数（全屋登记了 24 盏，见 H.Lights）。
+  //         每盏灯都是全屏逐片元成本，而且会被 three.js 展开进 shader，
+  //         集成显卡上这一项比分辨率更要命
   var TIERS = {
-    low:    { name: 'low',    scale: 0.72, shadow: 0,    tex: 512,  bloom: 1, aniso: 4,  env: 64,  detail: 0, fxaa: 1 },
-    medium: { name: 'medium', scale: 0.88, shadow: 1024, tex: 1024, bloom: 2, aniso: 8,  env: 128, detail: 1, fxaa: 1 },
-    high:   { name: 'high',   scale: 1.00, shadow: 2048, tex: 1024, bloom: 2, aniso: 16, env: 256, detail: 2, fxaa: 1 }
+    low:    { name: 'low',    scale: 0.72, shadow: 0,    tex: 512,  bloom: 1, aniso: 4,  env: 64,  detail: 0, fxaa: 0, lights: 8,  blur: 1 },
+    // medium 原本给了 1024 的平行光阴影：它要覆盖 48×40m 的整层，折算下来每米只有
+    // 21 像素，糊得几乎看不出是阴影，却要（a）多渲一遍全场景（b）在每个受光材质里
+    // 做 PCF 软采样。家具的落地感本来就有 shadowBlob 贴片兜着，直接关掉最划算
+    medium: { name: 'medium', scale: 0.88, shadow: 0,    tex: 1024, bloom: 1, aniso: 8,  env: 128, detail: 1, fxaa: 1, lights: 9,  blur: 1 },
+    high:   { name: 'high',   scale: 1.00, shadow: 2048, tex: 1024, bloom: 2, aniso: 16, env: 256, detail: 2, fxaa: 1, lights: 16, blur: 2 }
   };
   var BUDGET = { low: 1.05e6, medium: 1.7e6, high: 2.6e6 };
 
@@ -102,8 +108,14 @@ window.HOME = window.HOME || {};
     if (mobile) return JSON.parse(JSON.stringify(TIERS.low));
 
     var gpu = readGPU();
-    if (/SwiftShader|llvmpipe|Software|Mali|Adreno|PowerVR/i.test(gpu) ||
-        (/Intel/i.test(gpu) && !/Arc/i.test(gpu))) return JSON.parse(JSON.stringify(TIERS.medium));
+    // 软件渲染（没驱动 / 虚拟机）给 medium 等于直接卡死
+    if (/SwiftShader|llvmpipe|Software|Basic Render|Microsoft Basic/i.test(gpu)) {
+      return JSON.parse(JSON.stringify(TIERS.low));
+    }
+    if (/Mali|Adreno|PowerVR/i.test(gpu) || (/Intel/i.test(gpu) && !/Arc/i.test(gpu))) {
+      return JSON.parse(JSON.stringify(TIERS.medium));          // 集成显卡：中档 + 动态降级
+    }
+    if (!gpu) return JSON.parse(JSON.stringify(TIERS.medium));   // 读不到型号，保守一点
 
     return JSON.parse(JSON.stringify(TIERS.high));
   }
@@ -126,6 +138,10 @@ window.HOME = window.HOME || {};
     renderer.setClearColor(0x05070c, 1);
     renderer.shadowMap.enabled = QUALITY.shadow > 0;
     renderer.shadowMap.type = T.PCFSoftShadowMap;
+    // 场景几乎全是静物：阴影贴图不必每帧重画（见 H.tickShadow），
+    // 这一条在集成显卡上直接省掉「每帧多渲染一遍全场景」
+    renderer.shadowMap.autoUpdate = false;
+    renderer.shadowMap.needsUpdate = true;
     try {
       H.maxAniso = Math.max(1, Math.min(QUALITY.aniso, renderer.capabilities.getMaxAnisotropy()));
     } catch (e) { H.maxAniso = 4; }
@@ -166,32 +182,295 @@ window.HOME = window.HOME || {};
     if (post) post.setSize(db.x, db.y);
   };
 
-  var gov = { settle: 3.0, acc: 0, n: 0, upWait: 0, floorHits: 0 };
+  /* ============================ 3.5 点光源槽位池 ============================ *
+   * MeshStandardMaterial 里每一盏点光源都是「全屏逐片元」的成本，而且 three.js
+   * 会按场景里的灯数编译 shader —— 全屋 20 多盏灯同时在编译期展开，集成显卡直接趴下。
+   * 做法：各房间只登记「灯的描述」，真正进场景的是固定 N 个槽位；每隔 0.3s 按
+   * 玩家位置挑出最该亮的 N 盏填进槽位。灯数恒定 ⇒ 不会触发 shader 重编译。
+   * 被换下的都是隔着墙、离玩家 8m 以上的灯，观感上察觉不到。
+   * ======================================================================== */
+  H.Lights = (function () {
+    var defs = [], pool = [], sel = [], acc = 1e9, inited = false;
+
+    function add(color, intensity, dist, x, y, z, decay) {
+      var d = {
+        color: new T.Color(color),
+        intensity: intensity,
+        distance: dist || 10,
+        decay: decay === undefined ? 1.6 : decay,
+        x: x, y: y, z: z,
+        on: false, score: 0
+      };
+      defs.push(d);
+      return d;
+    }
+
+    function select(px, py, pz) {
+      var i;
+      for (i = 0; i < defs.length; i++) {
+        var d = defs[i];
+        var dx = d.x - px, dy = d.y - py, dz = d.z - pz;
+        var dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        // 评分 = 亮度 / (1 + 「光球表面到玩家的距离」²)
+        // 玩家在衰减半径内的灯按亮度排；半径外的按差多远迅速掉分。
+        // 不能只看「照到玩家没有」—— 餐区吊灯这种照不到人、但画面里看得见的灯也得留着
+        var gap = dist - d.distance;
+        if (gap < 0) gap = 0;
+        var s = d.intensity / (1 + gap * gap);
+        if (d.on) s *= 1.3;                  // 迟滞，避免在临界点反复开关
+        d.score = s;
+      }
+      var order = defs.slice().sort(function (a, b) { return b.score - a.score; });
+      for (i = 0; i < defs.length; i++) defs[i].on = false;
+      sel.length = 0;
+      for (i = 0; i < pool.length && i < order.length; i++) {
+        order[i].on = true;
+        sel.push(order[i]);
+      }
+    }
+
+    function apply() {
+      for (var i = 0; i < pool.length; i++) {
+        var l = pool[i], d = sel[i];
+        if (!d) { l.intensity = 0; continue; }
+        l.color.copy(d.color);
+        l.intensity = d.intensity;
+        l.distance = d.distance;
+        l.decay = d.decay;
+        l.position.set(d.x, d.y, d.z);
+      }
+    }
+
+    return {
+      add: add,
+      count: function () { return pool.length + '/' + defs.length; },
+      init: function (px, py, pz) {
+        if (inited || !scene) return;
+        inited = true;
+        var n = Math.min(defs.length, Math.max(1, QUALITY.lights || 12));
+        for (var i = 0; i < n; i++) {
+          var l = new T.PointLight(0xffffff, 0, 10, 1.6);
+          l.castShadow = false;
+          scene.add(l);
+          pool.push(l);
+        }
+        select(px || 0, py || 1.6, pz || 0);
+        apply();
+      },
+      // 调整槽位数：灯数变了 three.js 必须重编所有受光材质（卡顿一下），
+      // 所以只在降级阶梯里调用。返回 true 表示真的变了，需要重编译
+      setBudget: function (n, px, py, pz) {
+        if (!inited) return false;
+        n = Math.max(1, Math.min(defs.length, n));
+        if (n === pool.length) return false;
+        while (pool.length > n) scene.remove(pool.pop());
+        while (pool.length < n) {
+          var l = new T.PointLight(0xffffff, 0, 10, 1.6);
+          l.castShadow = false;
+          scene.add(l);
+          pool.push(l);
+        }
+        acc = 1e9;
+        select(px || 0, py || 1.6, pz || 0);
+        apply();
+        return true;
+      },
+      update: function (dt, px, py, pz) {
+        if (!inited) return;
+        acc += dt;
+        if (acc > 0.3) { acc = 0; select(px, py, pz); }
+        apply();
+      }
+    };
+  })();
+  H.addPoint = H.Lights.add;
+
+  /* ---- 几何缓存：同尺寸的 Box 共用一份 BufferGeometry ----
+   * 全屋几千个盒子里有大量重复尺寸（格栅、分缝、柜门、通风口……），
+   * 共用之后显存占用和启动时的上传次数都能明显下降 */
+  var boxCache = {};
+  H.boxGeo = function (w, h, d) {
+    var k = w.toFixed(4) + '_' + h.toFixed(4) + '_' + d.toFixed(4);
+    var g = boxCache[k];
+    if (!g) { g = new T.BoxGeometry(w, h, d); boxCache[k] = g; }
+    return g;
+  };
+
+  /* ---- 阴影贴图节流 ---- *
+   * 全屋只有门扇和机器人在动，阴影贴图按固定频率刷新即可；
+   * shadowEvery < 0 表示彻底冻结（保留最后一帧的阴影） */
+  var shadowEvery = 1 / 6, shadowAcc = 1e9;
+  H.tickShadow = function (dt) {
+    if (!renderer || !renderer.shadowMap.enabled) return;
+    if (shadowEvery < 0) { renderer.shadowMap.needsUpdate = false; return; }
+    shadowAcc += dt;
+    if (shadowAcc >= shadowEvery) {
+      shadowAcc = 0;
+      renderer.shadowMap.needsUpdate = true;
+    }
+  };
+
+  /* ---- 画质档位阶梯（可升可降） ---- *
+   * 动态分辨率已经触底还是跑不满帧时，按顺序砍掉最贵的那几项特效；
+   * 等帧率重新宽裕了再逐级加回来 —— 启动那几秒（建场景 + 编译 shader）帧率天然很低，
+   * 如果只降不升，开场的卡顿会把 bloom / 浮尘永久误杀掉。
+   * applyLevel 是幂等的：按目标等级把所有开关重新设一遍，不依赖当前状态。
+   * 等级 4、5 会改「进 shader 的开关」（阴影、灯数），翻转一次要重编译材质
+   * （卡顿约半秒），所以放在最后，并且要求更长的观察期才动。
+   * ======================================================================== */
+  var degradeLevel = 0;
+  H.degradeLevel = function () { return degradeLevel; };
+
+  // 改了阴影 / 灯数这类「会进 shader 的开关」之后，必须让材质重新编译。
+  // 这件事本身就是一次几百毫秒的卡顿 —— 必须让测速器把接下来这段时间整段丢掉，
+  // 否则就会变成「降级 → 重编译卡顿 → 又测到慢 → 再降级」的雪崩
+  function recompileAll() {
+    if (!scene) return;
+    scene.traverse(function (o) {
+      var m = o.material;
+      if (!m) return;
+      if (Array.isArray(m)) {
+        for (var i = 0; i < m.length; i++) m[i].needsUpdate = true;
+      } else m.needsUpdate = true;
+    });
+    H.stall(4);
+  }
+
+  function applyLevel(lv) {
+    var i, recompile = false;
+
+    // 1 级：宽光晕（3 个额外 pass）+ 阴影降频
+    if (post && post.setWide) post.setWide(lv < 1);
+    // 2 级：阴影冻结 + 浮尘
+    shadowEvery = lv >= 2 ? -1 : (lv >= 1 ? 1 / 3 : 1 / 6);
+    if (H.dust) H.dust.visible = lv < 2;
+    // 3 级：体积光锥 + 整条 bloom
+    if (H.shafts) {
+      // 用 material.visible：对象自身的 visible 由区域剔除管，不能互相覆盖
+      for (i = 0; i < H.shafts.length; i++) H.shafts[i].material.visible = lv < 3;
+    }
+    if (post && post.setBloom) post.setBloom(lv < 3);
+    // 4 级：FXAA + 阴影彻底下线（连「采样阴影贴图」的代价一起省掉）
+    if (post && post.setFxaa) post.setFxaa(lv < 4);
+    if (renderer) {
+      var wantShadow = QUALITY.shadow > 0 && lv < 4;
+      if (renderer.shadowMap.enabled !== wantShadow) {
+        renderer.shadowMap.enabled = wantShadow;
+        if (wantShadow) renderer.shadowMap.needsUpdate = true;
+        recompile = true;
+      }
+    }
+    // 5 级：点光源减到七成。砍太狠会让房间直接发灰发暗（9→5 肉眼就是「掉了一档」），
+    // 这一级的画质代价很大，所以只在「持续极慢」时才会被用到
+    var base = QUALITY.lights || 8;
+    var wantLights = lv >= 5 ? Math.max(6, Math.round(base * 0.7)) : base;
+    if (H.Lights.setBudget(wantLights,
+      camera ? camera.position.x : 0,
+      camera ? camera.position.y : 1.6,
+      camera ? camera.position.z : 0)) recompile = true;
+
+    if (recompile) recompileAll();
+  }
+
+  H.degrade = function (lv) {
+    lv = Math.min(5, Math.max(0, lv));
+    if (lv === degradeLevel) return;
+    degradeLevel = lv;
+    applyLevel(lv);
+    H.stall(1.5);                                  // 每次变档都给一段冷却再重新测速
+    H.emit('quality', dynScale);
+  };
+
+  // settle 的头几秒要跨过「首帧编译 shader + 上传贴图」的尖峰，
+  // 否则开场的卡顿会把特效误判成「跑不动」而砍掉。
+  // lock：恢复过两次又掉回来的等级，之后不再尝试，避免画面反复明暗抖动
+  var gov = {
+    settle: 5.0, acc: 0, n: 0, upWait: 0, floorHits: 0, good: 0,
+    lock: 0, tries: {}, samples: []
+  };
+
+  // 「接下来这 sec 秒别测速」：用在所有已知会制造尖峰的操作后面
+  // （材质重编译、切后台回来、重新拿指针锁、生成音频缓冲区……）
+  H.stall = function (sec) {
+    gov.settle = Math.max(gov.settle, sec || 1.5);
+    gov.acc = 0; gov.n = 0; gov.samples.length = 0;
+    gov.floorHits = 0; gov.good = 0;
+  };
+
   H.govern = function (dtMs) {
-    if (dtMs > 1500) return;                       // 切后台 / 断点，忽略
+    if (dtMs > 1500) { H.stall(1.5); return; }      // 切后台 / 断点
     gov.settle -= dtMs / 1000;
-    if (gov.settle > 0) { gov.acc = 0; gov.n = 0; return; }
+    if (gov.settle > 0) { gov.acc = 0; gov.n = 0; gov.samples.length = 0; return; }
 
     gov.acc += dtMs; gov.n++;
+    gov.samples.push(dtMs);
     if (gov.n < 45 && gov.acc < 900) return;
 
-    var avg = gov.acc / gov.n;
-    gov.acc = 0; gov.n = 0;
+    // 用中位数而不是平均值：一次 GC / 贴图上传的尖峰就能把 45 帧的均值从 16.7
+    // 拉到 27ms，足够误判成「跑不动」。中位数对这种孤立尖峰免疫，
+    // 只有「真的持续慢」才会体现出来
+    var sorted = gov.samples.slice().sort(function (a, b) { return a - b; });
+    var med = sorted[sorted.length >> 1];
+    gov.acc = 0; gov.n = 0; gov.samples.length = 0;
     var s = dynScale;
 
-    if (avg > 21.5 && s > 0.6) {                   // 太慢
-      s = avg > 45 ? 0.6 : Math.max(0.6, s - (avg > 30 ? 0.2 : 0.1));
+    // 约 46fps 以下算慢，约 57fps 以上算「有余量」。
+    // 注意上限受垂直同步限制：60Hz 下最快也就 16.7ms，所以好帧的阈值只能贴着它定
+    //
+    // ⚠ 改动下面这些阈值 / 迟滞计数后，请跑一遍 `node tools/sim-governor.js`
+    //   确认不会出现「偶发卡顿 → 一路降到底」的雪崩。
+    //   那个脚本镜像了本函数的决策逻辑，改这里就要同步改它。
+    var SLOW = 21.5, GOOD = 17.6;
+
+    if (med > SLOW && s > 0.6) {                   // 太慢：先降分辨率，这一步最便宜
+      s = med > 45 ? 0.6 : Math.max(0.6, s - (med > 30 ? 0.2 : 0.1));
       gov.upWait = Math.min(20, Math.max(2, gov.upWait * 2));
-    } else if (avg < 17.4 && s < 1 && gov.upWait <= 0) {
-      s = Math.min(1, s + 0.1);
-      gov.upWait = 2;
+      gov.good = 0;
+    } else if (med > SLOW) {                       // 分辨率已经触底 → 砍特效
+      gov.good = 0;
+      gov.floorHits++;
+      var next = degradeLevel + 1;
+      // 4、5 级要重编译材质（几百毫秒卡顿）且画质代价大，
+      // 必须「持续地、明显地慢」才动：连续 6 个窗口 + 中位数掉到 30fps 以下。
+      // 偶发一下卡顿绝不该走到这里
+      var needHits = next >= 4 ? 6 : 2;
+      if (next >= 4 && med < 33) needHits = Infinity;
+      if (gov.floorHits >= needHits) {
+        gov.floorHits = 0;
+        if ((gov.tries[next] || 0) >= 2) gov.lock = next;
+        H.degrade(next);
+      }
+    } else if (med < GOOD) {
+      gov.good++;
+      // 恢复顺序：先抢回画质收益最大的（bloom / 光锥 / FXAA / 灯光），
+      // 再把分辨率还回去，最后才补宽光晕、浮尘这类锦上添花的。
+      // 反过来做的话，分辨率会把预算吃光，bloom 永远回不来 —— 这个场景的
+      // 灯带和全息屏全靠 bloom 出效果，它比最后 20% 分辨率值钱得多
+      var canUp = degradeLevel > gov.lock;
+      if (canUp && (degradeLevel >= 3 || s >= 1)) {
+        var need = degradeLevel >= 4 ? 5 : 3;
+        // 已经被垂直同步顶住了，说明余量很大，不用再慢慢观察
+        if (med <= 17.0) need = Math.max(2, need - 2);
+        if (gov.good >= need) {
+          gov.good = 0;
+          gov.tries[degradeLevel] = (gov.tries[degradeLevel] || 0) + 1;
+          H.degrade(degradeLevel - 1);
+        }
+      } else if (s < 1 && gov.upWait <= 0) {
+        s = Math.min(1, s + 0.1);
+        gov.upWait = 2;
+        gov.good = 0;
+      }
+    } else {
+      gov.good = 0;                                // 处在中间地带：保持现状
     }
+    if (med < 20) gov.floorHits = 0;
     if (gov.upWait > 0) gov.upWait--;
 
     s = Math.round(s * 10) / 10;
     if (s !== dynScale) {
       dynScale = s;
-      gov.settle = 1;
+      gov.settle = Math.max(gov.settle, 1);
       H.resize();
       H.emit('quality', s);
     }
@@ -218,16 +497,22 @@ window.HOME = window.HOME || {};
     var optsA = { type: TYPE, minFilter: T.LinearFilter, magFilter: T.LinearFilter, depthBuffer: true, stencilBuffer: false };
     var optsB = { type: TYPE, minFilter: T.LinearFilter, magFilter: T.LinearFilter, depthBuffer: false, stencilBuffer: false };
 
+    var wide = QUALITY.bloom > 1;        // 是否启用第二级宽光晕
+    var sharp = QUALITY.detail > 1;      // 锐化是全屏 4 次采样，只给高画质
+    var blurIter = Math.max(1, QUALITY.blur || 2);
+    var wideOn = wide, bloomOn = !!QUALITY.bloom, fxaaOn = !!QUALITY.fxaa;
+
     var rtScene = new T.WebGLRenderTarget(2, 2, optsA);
     var rtA = new T.WebGLRenderTarget(2, 2, optsB);        // 1/4：紧光晕
     var rtB = new T.WebGLRenderTarget(2, 2, optsB);
-    var rtC = new T.WebGLRenderTarget(2, 2, optsB);        // 1/8：宽光晕（灯带的大面积溢光）
-    var rtD = new T.WebGLRenderTarget(2, 2, optsB);
+    // 1/8：宽光晕（灯带的大面积溢光）——用不到就别占显存
+    var rtC = wide ? new T.WebGLRenderTarget(2, 2, optsB) : null;
+    var rtD = wide ? new T.WebGLRenderTarget(2, 2, optsB) : null;
     // 色调映射之后的 LDR 缓冲，专门喂给 FXAA
-    var rtLDR = new T.WebGLRenderTarget(2, 2, {
+    var rtLDR = QUALITY.fxaa ? new T.WebGLRenderTarget(2, 2, {
       type: T.UnsignedByteType, minFilter: T.LinearFilter, magFilter: T.LinearFilter,
       depthBuffer: false, stencilBuffer: false
-    });
+    }) : null;
 
     var VS = FS_FRAG_HEAD + ' void main(){ vUv = uv; gl_Position = vec4(position.xy,0.0,1.0); }';
 
@@ -271,9 +556,6 @@ window.HOME = window.HOME || {};
       ].join('\n'),
       depthTest: false, depthWrite: false
     });
-
-    var wide = QUALITY.bloom > 1;        // 是否启用第二级宽光晕
-    var sharp = QUALITY.detail > 1;      // 锐化是全屏 4 次采样，只给高画质
 
     var compMat = new T.ShaderMaterial({
       uniforms: {
@@ -396,15 +678,26 @@ window.HOME = window.HOME || {};
 
     var api = {
       uniforms: compMat.uniforms,
+      setWide: function (on) {
+        wideOn = wide && on !== false;
+        compMat.uniforms.uWide.value = wideOn ? 0.62 : 0.0;
+      },
+      setBloom: function (on) {
+        bloomOn = !!QUALITY.bloom && on !== false;
+        compMat.uniforms.uBloom.value = bloomOn ? 0.42 : 0.0;
+      },
+      setFxaa: function (on) {
+        fxaaOn = !!rtLDR && on !== false;
+      },
       setSize: function (w, h) {
         w = Math.max(2, w); h = Math.max(2, h);
         rtScene.setSize(w, h);
-        rtLDR.setSize(w, h);
+        if (rtLDR) rtLDR.setSize(w, h);
         var bw = Math.max(2, w >> 2), bh = Math.max(2, h >> 2);
         rtA.setSize(bw, bh);
         rtB.setSize(bw, bh);
-        rtC.setSize(Math.max(2, w >> 3), Math.max(2, h >> 3));
-        rtD.setSize(Math.max(2, w >> 3), Math.max(2, h >> 3));
+        if (rtC) rtC.setSize(Math.max(2, w >> 3), Math.max(2, h >> 3));
+        if (rtD) rtD.setSize(Math.max(2, w >> 3), Math.max(2, h >> 3));
         compMat.uniforms.uRes.value.set(w, h);
         compMat.uniforms.uTexel.value.set(1 / w, 1 / h);
         fxaaMat.uniforms.uTexel.value.set(1 / w, 1 / h);
@@ -417,14 +710,13 @@ window.HOME = window.HOME || {};
         rd.clear();
         rd.render(sc, cam);
 
-        if (QUALITY.bloom) {
+        if (bloomOn) {
           brightMat.uniforms.tSrc.value = rtScene.texture;
           blit(brightMat, rtA);
-          blurPair(rtA, rtB, 1.0);
-          blurPair(rtA, rtB, 1.0);
+          for (var bi = 0; bi < blurIter; bi++) blurPair(rtA, rtB, 1.0);
           compMat.uniforms.tBloom.value = rtA.texture;
 
-          if (wide) {
+          if (wideOn) {
             // 1/8 分辨率再糊两轮：灯带、屏幕的大范围溢光
             blurMat.uniforms.tSrc.value = rtA.texture;
             blurMat.uniforms.uDir.value.set(1.0 / rtA.width, 0);
@@ -435,7 +727,7 @@ window.HOME = window.HOME || {};
         }
 
         compMat.uniforms.tScene.value = rtScene.texture;
-        if (QUALITY.fxaa) {
+        if (fxaaOn) {
           blit(compMat, rtLDR);
           fxaaMat.uniforms.tSrc.value = rtLDR.texture;
           blit(fxaaMat, null);
@@ -976,6 +1268,10 @@ window.HOME = window.HOME || {};
     function init() {
       if (ctx || !AC) return ctx;
       try {
+        // 混响脉冲（1.9s 立体声）+ 2s 噪声底 ≈ 50 万个采样点，全在主线程上现算。
+        // 它发生在「第一次点击」那一刻，正好是玩家开始走动的时候 —— 不打招呼的话，
+        // 测速器会把这一下算成「场景跑不动」
+        H.stall(1.5);
         ctx = new AC();
         master = ctx.createGain();
         master.gain.value = 0.85;
@@ -1083,6 +1379,8 @@ window.HOME = window.HOME || {};
     function setRain(on, level) {
       if (!ready || !enabled) return;
       if (on && !rainSrc) {
+        // 4 秒循环雨声 = 十几万个采样点，在主线程上现算，是一次实打实的掉帧
+        H.stall(1);
         rainSrc = ctx.createBufferSource();
         rainSrc.buffer = makeNoise(4);
         rainSrc.loop = true;

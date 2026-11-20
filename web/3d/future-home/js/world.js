@@ -133,10 +133,13 @@
     });
 
     // ---- 玻璃：靠环境反射出型，别靠不透明度 ----
+    // clearcoat 会在 shader 里多编一层高光（USE_CLEARCOAT），落地窗又是大面积，
+    // 中低画质直接关掉，反射主要还是靠 envMap
     mats.glass = new T.MeshPhysicalMaterial({
       color: 0xaedcff, transparent: true, opacity: 0.085, roughness: 0.03,
       metalness: 0.0, side: T.DoubleSide, depthWrite: false,
-      envMapIntensity: 2.4, clearcoat: 1.0, clearcoatRoughness: 0.02,
+      envMapIntensity: 2.4,
+      clearcoat: H.QUALITY.detail > 1 ? 1.0 : 0.0, clearcoatRoughness: 0.02,
       ior: 1.45, reflectivity: 0.6
     });
     mats.water = new T.MeshStandardMaterial({
@@ -201,7 +204,7 @@
   var scene = null;
 
   H.box = function (w, h, d, mat, x, y, z) {
-    var m = new T.Mesh(new T.BoxGeometry(w, h, d), mat);
+    var m = new T.Mesh(H.boxGeo(w, h, d), mat);
     m.position.set(x, y, z);
     m.castShadow = true;
     m.receiveShadow = true;
@@ -209,7 +212,7 @@
   };
 
   H.glowStrip = function (w, h, d, x, y, z, mat) {
-    var m = new T.Mesh(new T.BoxGeometry(w, h, d), mat || mats.strip);
+    var m = new T.Mesh(H.boxGeo(w, h, d), mat || mats.strip);
     m.position.set(x, y, z);
     return m;
   };
@@ -244,8 +247,8 @@
     var len = b - a, hh = y1 - y0;
     if (len <= 0.002 || hh <= 0.002) return null;
     var geo = axis === 'z'
-      ? new T.BoxGeometry(WT, hh, len)
-      : new T.BoxGeometry(len, hh, WT);
+      ? H.boxGeo(WT, hh, len)
+      : H.boxGeo(len, hh, WT);
     var m = new T.Mesh(geo, mat);
     m.position.set(
       axis === 'z' ? fixed : (a + b) / 2,
@@ -1129,9 +1132,7 @@
     scene.add(sign);
 
     // 门厅顶灯
-    var l = new T.PointLight(0xa8d8ff, 4.5, 11, 1.6);
-    l.position.set(16.8, 2.6, 0);
-    scene.add(l);
+    H.Lights.add(0xa8d8ff, 4.5, 11, 16.8, 2.6, 0);
   };
 
   /* ============================ 灯光 ============================ */
@@ -1157,29 +1158,20 @@
     H.moonLight = moon;
 
     // 室内补光（客厅暖光 / 玄关冷光 / 游戏房青光 / 影院蓝光）
-    function addPoint(color, intensity, dist, x, y, z) {
-      var l = new T.PointLight(color, intensity, dist, 1.6);
-      l.position.set(x, y, z);
-      scene.add(l);
-      return l;
-    }
+    // 这里只是「登记」，实际进场景的是 H.Lights 的固定槽位（见 core.js 3.5）
+    var addPoint = H.Lights.add;
     addPoint(0xffd6a5, 11, 18, 4.4, 2.45, -4.2);    // 客厅 · 沙发区
     addPoint(0xffd2a0, 5.5, 16, 3.8, 2.62, 3.2);    // 客厅 · 入口侧
     addPoint(0xffe6c4, 10, 11, 11.6, 2.65, 5.4);    // 厨房 · 主灯（两组灯盘之间）
-    if (H.QUALITY.name !== 'low') {                 // 低画质少放两盏，控制灯光数量
-      addPoint(0xffcf9c, 5.0, 8, 12.9, 1.7, 7.4);   // 厨房 · 台面补光（吊柜下）
-      addPoint(0xffd9b0, 4.5, 8, 10.0, 2.3, 3.9);   // 厨房 · 吧台侧补光
-    }
+    addPoint(0xffcf9c, 5.0, 8, 12.9, 1.7, 7.4);     // 厨房 · 台面补光（吊柜下）
+    addPoint(0xffd9b0, 4.5, 8, 10.0, 2.3, 3.9);     // 厨房 · 吧台侧补光
     addPoint(0xffd8ae, 5.0, 7, 5.2, 1.85, 5.4);     // 餐区 · 吊灯
     addPoint(0x9fdcff, 5.5, 11, 11.6, 2.5, 0);      // 玄关
     addPoint(0x4fd4ff, 7.5, 13, -9, 2.5, -5.2);     // 游戏房
     addPoint(0x3f6bff, 4.0, 12, -9, 2.4, 5.5);      // 影院
-    var bedLight = addPoint(0xffc89a, 7.5, 13, -11.6, 2.42, 1.0); // 卧室（可换色）
-    H.bedroomLight = bedLight;
-    if (H.QUALITY.name !== 'low') {
-      addPoint(0xffd2a6, 3.6, 6, -12.3, 1.5, -1.5);   // 卧室 · 书桌台灯补光
-      addPoint(0xffc9a2, 2.4, 5, -14.8, 3.05, -1.85);  // 卧室 · 衣柜顶部洗墙
-    }
+    H.bedroomLight = addPoint(0xffc89a, 7.5, 13, -11.6, 2.42, 1.0); // 卧室（可换色）
+    addPoint(0xffd2a6, 3.6, 6, -12.3, 1.5, -1.5);   // 卧室 · 书桌台灯补光
+    addPoint(0xffc9a2, 2.4, 5, -14.8, 3.05, -1.85); // 卧室 · 衣柜顶部洗墙
 
     // 窗外冷光（模拟城市溢光）
     var rim = new T.DirectionalLight(0x6ea8d8, 0.22);
@@ -1192,6 +1184,7 @@
   /* ---- 体积光锥：射灯下方的一截可见光柱，空气感全靠它 ---- */
   function buildLightShafts() {
     if (H.QUALITY.detail <= 0) return;
+    H.shafts = [];
     var geo = new T.CylinderGeometry(0.10, 0.62, 2.5, 16, 1, true);
     var mat = new T.ShaderMaterial({
       uniforms: { uColor: { value: new T.Color(0xffd9ae) }, uStrength: { value: 0.30 } },
@@ -1228,6 +1221,7 @@
       if (scale) m.scale.set(scale, 1, scale);
       m.renderOrder = 2;
       scene.add(m);
+      H.shafts.push(m);
     }
     // 走廊射灯下方
     for (var i = 0; i < 5; i++) shaft(-13 + i * 5.4, -7.2, 0xffd9ae, 0.26, 0.85);
@@ -1258,4 +1252,93 @@
     bedroom: '卧室',
     cinema: '私人影院'
   };
+
+  /* ============================ 区域剔除 ============================ *
+   * 房间之间都有实墙，远处房间里的陈设（往往占了一半以上的 draw call）
+   * 既看不见又在每帧消耗 CPU。这里按包围盒把「外壳之后加入的陈设」归到房间，
+   * 离开一定距离就整组 visible=false。
+   * 只收录「完整落在房间轮廓内」的对象 —— 地面 / 墙体 / 天花 / 落地窗 / 门厅
+   * 都是跨区或外壳对象，永远保持可见，所以不会剔出空洞。
+   * show 半径取得很保守：只有在「隔着墙、门洞也看不进去」的位置才会真的剔掉
+   *   · 西三间：玄关 / 厨房 / 卫生间一侧（门此时是磨砂关闭状态）
+   *   · 卫生间 / 康养室：玩家深入西区之后
+   * live 半径比 show 小一圈：看不见时连 update（含屏幕重绘）一起停掉。
+   * ======================================================================== */
+  var CULL_DEF = [
+    { zone: 'arcade',  rect: [-16.3, -2.02, -8.3, -2.52], ax: -9.0, az: -5.25, show: 21, live: 11 },
+    { zone: 'bedroom', rect: [-16.3, -2.02, -2.48, 2.98], ax: -11.0, az: 0.25, show: 21, live: 11 },
+    { zone: 'cinema',  rect: [-16.3, -2.02, 3.02, 8.3],   ax: -8.5, az: 5.5,  show: 21, live: 11 },
+    { zone: 'bath',    rect: [9.92, 14.1, -8.3, -4.56],   ax: 11.9, az: -6.3, show: 22, live: 10 },
+    { zone: 'care',    rect: [-2.0, 1.62, -8.3, -4.40],   ax: -0.2, az: -6.1, show: 16, live: 12 },
+    // 客厅/玄关始终可见，这一条只用来决定「大屏等动画要不要继续刷」
+    { zone: 'living',  ax: 4.4, az: -8.0, live: 17 }
+  ];
+
+  H.cull = (function () {
+    var groups = [], live = {}, ready = false;
+
+    function init() {
+      if (ready) return;
+      var kids = H.scene.children, start = H.shell.mark || 0;
+      var i, j;
+      for (i = 0; i < CULL_DEF.length; i++) {
+        var d = CULL_DEF[i];
+        groups.push({
+          def: d, items: [], flags: [], on: true,
+          show2: d.show ? d.show * d.show : -1,
+          live2: d.live * d.live
+        });
+        live[d.zone] = true;
+      }
+      for (i = start; i < kids.length; i++) {
+        var o = kids[i];
+        if (o.isLight || !(o.isMesh || o.isGroup || o.isPoints)) continue;
+        var bb = new T.Box3();
+        try { bb.setFromObject(o); } catch (e) { continue; }
+        if (bb.isEmpty() || !isFinite(bb.min.x) || !isFinite(bb.max.z)) continue;
+        for (j = 0; j < groups.length; j++) {
+          var r = groups[j].def.rect;
+          if (!r) continue;
+          if (bb.min.x >= r[0] && bb.max.x <= r[1] && bb.min.z >= r[2] && bb.max.z <= r[3]) {
+            groups[j].items.push(o);
+            groups[j].flags.push(o.visible);
+            break;
+          }
+        }
+      }
+      ready = true;
+    }
+
+    function update(px, pz, zone) {
+      if (!ready) return;
+      for (var i = 0; i < groups.length; i++) {
+        var g = groups[i];
+        var dx = px - g.def.ax, dz = pz - g.def.az;
+        var d2 = dx * dx + dz * dz;
+        var here = zone === g.def.zone;
+        live[g.def.zone] = here || d2 < g.live2;
+        if (g.show2 < 0) continue;
+        var want = here || d2 < g.show2;
+        if (want === g.on) continue;
+        g.on = want;
+        for (var k = 0; k < g.items.length; k++) {
+          g.items[k].visible = want ? g.flags[k] : false;
+        }
+      }
+    }
+
+    return {
+      init: init,
+      update: update,
+      // 没登记过的区域（机器人、门等）默认一直活跃
+      isLive: function (zone) { return live[zone] === undefined ? true : live[zone]; },
+      stat: function () {
+        var s = [];
+        for (var i = 0; i < groups.length; i++) {
+          s.push(groups[i].def.zone + ':' + groups[i].items.length + (groups[i].on ? '+' : '-'));
+        }
+        return s.join(' ');
+      }
+    };
+  })();
 })(window.HOME);

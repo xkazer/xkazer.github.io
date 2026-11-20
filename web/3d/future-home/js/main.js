@@ -96,6 +96,12 @@
   function prepare() {
     H.camera.rotation.order = 'YXZ';
     syncCamera();
+    H.renderer.info.autoReset = false;         // 统计整帧（含后处理各 pass）
+    // 灯光槽位 / 区域剔除都要等全部房间建完才知道该管哪些东西
+    H.Lights.init(player.x, player.eye, player.z);
+    H.cull.init();
+    // compile 只会遍历「可见」对象，所以必须在剔除开始之前把 shader 全部编完，
+    // 否则第一次走进某个房间会卡一下
     H.renderer.compile(H.scene, H.camera);
   }
 
@@ -128,6 +134,7 @@
   }
 
   /* ============================ 交互 ============================ */
+  var hintText = null;
   function updateInteract() {
     var best = null, bestD = 1e9;
     for (var i = 0; i < H.interactables.length; i++) {
@@ -138,14 +145,19 @@
     }
     activeInteract = best;
 
-    if (best) {
-      if (isTouch) hintEl.textContent = best.label;
-      else hintEl.innerHTML = '<b>E</b> ' + best.label;
-      hintEl.classList.add('show');
-    } else {
-      hintEl.classList.remove('show');
+    // 只在文案变化时写 DOM：每帧改 innerHTML 会逼浏览器重新解析 + 布局
+    var label = best ? best.label : null;
+    if (label !== hintText) {
+      hintText = label;
+      if (label) {
+        if (isTouch) hintEl.textContent = label;
+        else hintEl.innerHTML = '<b>E</b> ' + label;
+        hintEl.classList.add('show');
+      } else {
+        hintEl.classList.remove('show');
+      }
+      if (actBtn) actBtn.classList.toggle('show', !!label);
     }
-    if (actBtn) actBtn.classList.toggle('show', !!best);
   }
 
   function doInteract() {
@@ -264,9 +276,13 @@
   /* ============================ 主循环 ============================ */
   var clock = new T.Clock();
   var fpsAcc = 0, fpsFrames = 0, running = false;
+  // three.js 默认每次 render() 都会清零统计，而我们一帧要渲 2~5 个 pass，
+  // 直接读会只剩最后一个全屏 blit。改成手动清零（见 prepare），统计才是「整帧」的
+  var perf = { calls: 0, tris: 0 };
 
   function stepSim(dt) {
     time += dt;
+    H.renderer.info.reset();
 
     if (interactCool > 0) interactCool -= dt;
 
@@ -277,16 +293,27 @@
     if (H.autoDoors) {
       for (var di = 0; di < H.autoDoors.length; di++) H.autoDoors[di].update(dt, player.x, player.z);
     }
-    if (rooms.living) rooms.living.update(dt, time);
-    if (rooms.arcade) rooms.arcade.update(dt, time);
-    if (rooms.cinema) rooms.cinema.update(dt, time);
-    if (rooms.bedroom) rooms.bedroom.update(dt, time);
-    if (rooms.bath) rooms.bath.update(dt, time);
-    if (rooms.care) rooms.care.update(dt, time);
+
+    // 远处房间整组隐藏（必须在各房间 update 之前，否则会覆盖房间自己的显隐逻辑）
+    H.cull.update(player.x, player.z, player.zone);
+    var liveIn = H.cull.isLive;
+
+    // 看不见的房间连动画 / 屏幕重绘一起停：这里省下的全是 CPU 与贴图上传
+    if (rooms.living && liveIn('living')) rooms.living.update(dt, time);
+    if (rooms.arcade && liveIn('arcade')) rooms.arcade.update(dt, time);
+    if (rooms.cinema && liveIn('cinema')) rooms.cinema.update(dt, time);
+    if (rooms.bedroom && liveIn('bedroom')) rooms.bedroom.update(dt, time);
+    if (rooms.bath && liveIn('bath')) rooms.bath.update(dt, time);
+    if (rooms.care && liveIn('care')) rooms.care.update(dt, time);
     if (rooms.robot) rooms.robot.update(dt, time);
+
+    H.Lights.update(dt, player.x, player.eye, player.z);
+    H.tickShadow(dt);
 
     updateInteract();
     H.renderFrame(time);
+    perf.calls = H.renderer.info.render.calls;
+    perf.tris = H.renderer.info.render.triangles;
     H.Input.endFrame();
   }
 
@@ -320,6 +347,7 @@
     } else if (bootEl.classList.contains('done') || bootEl.style.display === 'none') {
       running = true;
       clock.getDelta();
+      H.stall(2);                                // 回到前台的头几帧必然很慢，别当真
       requestAnimationFrame(tick);
     }
   });
@@ -435,6 +463,7 @@
     } else {
       enterPause();
     }
+    H.stall(1.5);          // 进出指针锁会触发合成器重排，顺带把音频上下文唤醒
   });
 
   H.on('key', function (code) {
@@ -454,17 +483,19 @@
     H.Audio.setRain(isRain && player.zone === 'bedroom', 0.10);
   });
 
-  H.on('quality', function (scale) {
-    modeEl.textContent = H.QUALITY.name + ' ' + Math.round(scale * 100) + '%';
-  });
+  function showMode(scale) {
+    var lv = H.degradeLevel ? H.degradeLevel() : 0;
+    modeEl.textContent = H.QUALITY.name + ' ' + Math.round(scale * 100) + '%' + (lv ? ' -' + lv : '');
+  }
 
-  window.addEventListener('resize', function () { H.resize(); });
+  H.on('quality', showMode);
+
+  window.addEventListener('resize', function () { H.resize(); H.stall(1); });
 
   /* ============================ 启动 ============================ */
   H.init3D(canvas);
   modeEl.textContent = H.QUALITY.name + ' 100%';
   bootNext();
-
   /* ============================ 调试钩子 ============================ */
   window.__HOME__ = {
     ready: false,
@@ -490,8 +521,13 @@
       return time;
     },
     state: function () {
-      var meshes = 0;
-      H.scene.traverse(function (o) { if (o.isMesh || o.isPoints) meshes++; });
+      var meshes = 0, drawn = 0;
+      H.scene.traverse(function (o) {
+        if (o.isMesh || o.isPoints) {
+          meshes++;
+          if (o.visible && (!o.parent || o.parent.visible)) drawn++;
+        }
+      });
       return {
         zone: player.zone,
         pos: { x: +player.x.toFixed(2), z: +player.z.toFixed(2) },
@@ -499,8 +535,15 @@
         bedroom: rooms.bedroom ? rooms.bedroom.sceneName() : '',
         boxes: H.physics.boxes.length,
         meshes: meshes,
+        drawn: drawn,
+        calls: perf.calls,
+        tris: perf.tris,
+        lights: H.Lights.count(),
+        cull: H.cull.stat(),
+        degrade: H.degradeLevel(),
         quality: H.QUALITY.name
       };
-    }
+    },
+    degrade: function (lv) { H.degrade(lv); }
   };
 })(window.HOME);

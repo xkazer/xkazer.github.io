@@ -12,6 +12,9 @@
   H.rooms = {};
   H.interactables = [];
 
+  // 程序化噪声的八度数：环幕 / 景观幕墙都是近乎全屏的大曲面，低画质少叠两层
+  var FBM_OCT = H.QUALITY.detail > 1 ? 5 : 3;
+
   function addInteract(x, z, radius, label, action) {
     var it = { x: x, z: z, r: radius, label: label, action: action };
     H.interactables.push(it);
@@ -575,11 +578,7 @@
     }
 
     // 座位区中性补光：蓝调环境里给浅色外壳补一点灰白，避免整把椅子糊成黑块
-    if (H.QUALITY.name !== 'low') {
-      var podLight = new T.PointLight(0xffeede, 1.5, 4.6, 2.0);
-      podLight.position.set(SX - 0.35, 2.45, SZ);
-      scene.add(podLight);
-    }
+    H.Lights.add(0xffeede, 1.5, 4.6, SX - 0.35, 2.45, SZ, 2.0);
 
     /* ---- 走道灯带：把入口到游戏区的动线拉出来 ---- */
     var pathGlow = new T.MeshBasicMaterial({ color: 0x2f8ea1, transparent: true, opacity: 0.55 });
@@ -919,7 +918,9 @@
         '  return mix(mix(h21(i), h21(i + vec2(1.0,0.0)), u.x),',
         '             mix(h21(i + vec2(0.0,1.0)), h21(i + vec2(1.0,1.0)), u.x), u.y);',
         '}',
-        'float fbm2(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ s += a * noise2(p); p *= 2.03; a *= 0.5; } return s; }',
+        // 八度数跟画质挂钩：这些曲面几乎铺满屏幕，每多一层都是全屏成本
+        'float fbm2(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < ' + FBM_OCT +
+          '; i++){ s += a * noise2(p); p *= 2.03; a *= 0.5; } return s; }',
         'void main(){',
         '  vec3 pos = vWorld;',
         // 世界坐标斜投影取噪声：任何朝向的面都有二维变化，墙顶连成一片云海
@@ -1258,12 +1259,8 @@
     scene.add(cab);
     H.physics.add(DC_X - DC_W / 2, DC_Z - DC_D / 2, DC_X + DC_W / 2, DC_Z + DC_D / 2, 0, DC_H, 'cabinet');
     H.shadowBlob(DC_X, DC_Z + 0.24, 0.95, 0.36, 0.45);
-    if (H.QUALITY.name !== 'low') {
-      // 柜内顶灯：放在柜体内部，避免在玻璃门上打出一块高光
-      var cabLight = new T.PointLight(0xffcf9a, 1.8, 2.6, 2.0);
-      cabLight.position.set(DC_X, DC_H - 0.16, DC_Z + 0.04);
-      scene.add(cabLight);
-    }
+    // 柜内顶灯：放在柜体内部，避免在玻璃门上打出一块高光
+    H.Lights.add(0xffcf9a, 1.8, 2.6, DC_X, DC_H - 0.16, DC_Z + 0.04, 2.0);
 
     /* ---- 阅读角（房间中部偏东，面朝西侧景观幕墙）---- */
     var NT_X = -6.3, NT_Z = 1.3;
@@ -1419,11 +1416,7 @@
     scene.add(rlamp);
     H.physics.add(RL_X - 0.20, RL_Z - 0.20, RL_X + 0.20, RL_Z + 0.20, 0, 1.62, 'reading-lamp');
     H.shadowBlob(RL_X, RL_Z, 0.28, 0.28, 0.4);
-    if (H.QUALITY.name !== 'low') {
-      var rlLight = new T.PointLight(0xffd2a6, 2.6, 4.4, 2.0);
-      rlLight.position.set(RL_X + 0.90, 1.34, RL_Z);
-      scene.add(rlLight);
-    }
+    H.Lights.add(0xffd2a6, 2.6, 4.4, RL_X + 0.90, 1.34, RL_Z, 2.0);
 
     // ---- 景观幕墙（西墙，朝 +x）----
     var uni = {
@@ -1444,7 +1437,9 @@
         '  return mix(mix(h21(i), h21(i + vec2(1.0,0.0)), u.x),',
         '             mix(h21(i + vec2(0.0,1.0)), h21(i + vec2(1.0,1.0)), u.x), u.y);',
         '}',
-        'float fbm2(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ s += a * noise2(p); p *= 2.03; a *= 0.5; } return s; }',
+        // 八度数跟画质挂钩：这些曲面几乎铺满屏幕，每多一层都是全屏成本
+        'float fbm2(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < ' + FBM_OCT +
+          '; i++){ s += a * noise2(p); p *= 2.03; a *= 0.5; } return s; }',
         'void main(){',
         '  vec2 uv = vUv;',
         '  float t = uTime;',
@@ -1573,7 +1568,9 @@
         '  return mix(mix(h21(i), h21(i + vec2(1.0,0.0)), u.x),',
         '             mix(h21(i + vec2(0.0,1.0)), h21(i + vec2(1.0,1.0)), u.x), u.y);',
         '}',
-        'float fbm2(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ s += a * noise2(p); p *= 2.03; a *= 0.5; } return s; }',
+        // 八度数跟画质挂钩：这些曲面几乎铺满屏幕，每多一层都是全屏成本
+        'float fbm2(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < ' + FBM_OCT +
+          '; i++){ s += a * noise2(p); p *= 2.03; a *= 0.5; } return s; }',
         'void main(){',
         '  vec2 p = vUv * vec2(5.0, 2.2);',
         '  float n = fbm2(p * 1.3 + vec2(uTime * 0.020, uTime * 0.010));',
@@ -2190,22 +2187,11 @@
     scene.add(H.box(0.16, 0.012, 0.16, new T.MeshBasicMaterial({ color: 0xfff3e4 }), X1 - 0.42, 3.15, VC_Z));
 
     /* ---- 灯 ---- */
-    var keyLight = new T.PointLight(0xfff7ee, 6.2, 8.0, 1.8);
-    keyLight.position.set(11.95, 2.72, -6.00);
-    scene.add(keyLight);
+    H.Lights.add(0xfff7ee, 6.2, 8.0, 11.95, 2.72, -6.00, 1.8);
     // 两侧补光：只靠一盏顶灯会在墙上烧出一块死白
-    var fillW = new T.PointLight(0xe4f1ff, 1.9, 4.6, 1.8);
-    fillW.position.set(10.85, 2.05, -5.70);
-    scene.add(fillW);
-    var fillE = new T.PointLight(0xfff0e4, 2.4, 4.6, 1.8);
-    fillE.position.set(13.35, 2.00, -6.30);
-    scene.add(fillE);
-
-    if (H.QUALITY.name !== 'low') {
-      var showerLight = new T.PointLight(0xcfe8ff, 1.6, 3.4, 2.0);
-      showerLight.position.set(SCX, 2.34, SCZ);
-      scene.add(showerLight);
-    }
+    H.Lights.add(0xe4f1ff, 1.9, 4.6, 10.85, 2.05, -5.70, 1.8);
+    H.Lights.add(0xfff0e4, 2.4, 4.6, 13.35, 2.00, -6.30, 1.8);
+    H.Lights.add(0xcfe8ff, 1.6, 3.4, SCX, 2.34, SCZ, 2.0);
 
     /* ---- 交互：开 / 关淋浴 ---- */
     var wet = 0, wetTarget = 0;
@@ -2727,23 +2713,10 @@
     H.physics.add(TX - 0.32, TZ - 0.26, TX + 0.32, TZ + 0.26, 0, 0.66, 'care-plant');
 
     /* ---- 灯光 ---- */
-    var keyLight = new T.PointLight(0xfff1e0, 5.2, 7.5, 1.9);
-    keyLight.position.set(0.10, 2.82, -6.10);
-    scene.add(keyLight);
-
-    var holoLight = new T.PointLight(0x66d6ff, 1.8, 4.4, 1.8);
-    holoLight.position.set(-1.35, 1.70, -6.34);
-    scene.add(holoLight);
-
-    var doorLight = new T.PointLight(0xffe9d4, 2.0, 4.6, 1.9);
-    doorLight.position.set(-0.36, 2.05, -5.05);
-    scene.add(doorLight);
-
-    if (H.QUALITY.name !== 'low') {
-      var cabLight = new T.PointLight(0xffe6c8, 1.4, 3.2, 2.0);
-      cabLight.position.set(0.95, 1.75, -6.00);
-      scene.add(cabLight);
-    }
+    H.Lights.add(0xfff1e0, 5.2, 7.5, 0.10, 2.82, -6.10, 1.9);
+    H.Lights.add(0x66d6ff, 1.8, 4.4, -1.35, 1.70, -6.34, 1.8);
+    H.Lights.add(0xffe9d4, 2.0, 4.6, -0.36, 2.05, -5.05, 1.9);
+    H.Lights.add(0xffe6c8, 1.4, 3.2, 0.95, 1.75, -6.00, 2.0);
 
     /* ---- 交互：进舱 / 出舱 ---- */
     var seated = false, seatT = 0;
