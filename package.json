@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node ./app.js"
   },
+  "engines": {
+    "node": ">=22.5"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xkazer/xkazer.github.io.git"

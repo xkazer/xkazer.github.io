@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=2">
+  <title>访问统计</title>
+  <style>
+    .stats { width: min(900px, 100%); }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .kpi {
+      padding: 16px 18px; border-radius: var(--radius);
+      background: rgba(255, 255, 255, .82);
+      box-shadow: 0 8px 24px rgba(20, 87, 217, .12);
+    }
+    .kpi b { display: block; font-size: 26px; line-height: 1.25; color: var(--blue-700); font-variant-numeric: tabular-nums; }
+    .kpi span { font-size: 11px; letter-spacing: .08em; color: var(--text-muted); }
+
+    .card-box {
+      margin-top: 22px; padding: 18px 20px; border-radius: var(--radius);
+      background: rgba(255, 255, 255, .82);
+      box-shadow: 0 8px 24px rgba(20, 87, 217, .12);
+    }
+    .card-box h2 { margin: 0 0 16px; font-size: 13px; letter-spacing: .1em; color: var(--blue-900); }
+
+    .bars { display: flex; align-items: stretch; gap: 8px; height: 140px; }
+    .bar { flex: 1; max-width: 64px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .bar .track { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+    .bar .track i {
+      display: block; width: 100%; min-height: 3px; border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, #2f7cf0, #a8cbf9);
+    }
+    .bar u { font-size: 9px; color: var(--text-muted); text-decoration: none; white-space: nowrap; }
+    .bar em { font-size: 10px; color: var(--blue-700); font-style: normal; font-variant-numeric: tabular-nums; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #e2ecfb; text-align: left; }
+    th { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--text-muted); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.path { word-break: break-all; }
+    tbody tr:hover { background: rgba(230, 240, 254, .6); }
+
+    .empty { font-size: 13px; color: var(--text-muted); padding: 6px 0; }
+
+    @media (max-width: 640px) {
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .bar u { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="stats">
+      <div class="kpis" id="kpis"></div>
+
+      <div class="card-box">
+        <h2>最近 14 天</h2>
+        <div class="bars" id="bars"><div class="empty">加载中…</div></div>
+      </div>
+
+      <div class="card-box">
+        <h2>页面排行</h2>
+        <div id="pageTable"><div class="empty">加载中…</div></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <a href="./">← 返回首页</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var kpisEl = document.getElementById('kpis');
+      var barsEl = document.getElementById('bars');
+      var tableEl = document.getElementById('pageTable');
+
+      function node(tag, cls, text) {
+        var el = document.createElement(tag);
+        if (cls) el.className = cls;
+        if (text != null) el.textContent = text;   // 统一走 textContent，避免路径里的字符被当成 HTML
+        return el;
+      }
+
+      function kpi(label, value) {
+        var box = node('div', 'kpi');
+        box.appendChild(node('b', '', value));
+        box.appendChild(node('span', '', label));
+        return box;
+      }
+
+      function renderKpis(d) {
+        kpisEl.textContent = '';
+        kpisEl.appendChild(kpi('今日 PV', d.today.pv));
+        kpisEl.appendChild(kpi('今日 UV', d.today.uv));
+        kpisEl.appendChild(kpi('累计 PV', d.total.pv));
+        kpisEl.appendChild(kpi('累计 UV', d.total.uv));
+      }
+
+      function renderDays(d) {
+        barsEl.textContent = '';
+        if (!d.days.length) {
+          barsEl.appendChild(node('div', 'empty', '还没有数据'));
+          return;
+        }
+        var max = 1;
+        d.days.forEach(function (x) { if (x.pv > max) max = x.pv; });
+        d.days.forEach(function (x) {
+          var col = node('div', 'bar');
+          var track = node('div', 'track');
+          var bar = node('i');
+          bar.style.height = Math.max(3, Math.round(x.pv / max * 100)) + '%';
+          bar.title = x.day + ' · PV ' + x.pv + ' · UV ' + x.uv;
+          track.appendChild(bar);
+          col.appendChild(node('em', '', x.pv));
+          col.appendChild(track);
+          col.appendChild(node('u', '', x.day.slice(5)));
+          barsEl.appendChild(col);
+        });
+      }
+
+      function renderPages(d) {
+        tableEl.textContent = '';
+        if (!d.pages.length) {
+          tableEl.appendChild(node('div', 'empty', '还没有数据'));
+          return;
+        }
+        var table = node('table');
+        var thead = node('thead');
+        var hr = node('tr');
+        hr.appendChild(node('th', '', '页面'));
+        hr.appendChild(node('th', 'num', '今日'));
+        hr.appendChild(node('th', 'num', '累计'));
+        hr.appendChild(node('th', '', '最近'));
+        thead.appendChild(hr);
+        table.appendChild(thead);
+
+        var tbody = node('tbody');
+        d.pages.forEach(function (x) {
+          var tr = node('tr');
+          tr.appendChild(node('td', 'path', x.page));
+          tr.appendChild(node('td', 'num', x.today));
+          tr.appendChild(node('td', 'num', x.pv));
+          tr.appendChild(node('td', '', x.last || '-'));
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        tableEl.appendChild(table);
+      }
+
+      function fail(msg) {
+        kpisEl.textContent = '';
+        barsEl.textContent = '';
+        tableEl.textContent = '';
+        tableEl.appendChild(node('div', 'empty', msg));
+      }
+
+      fetch('/api/visit/stats', { cache: 'no-store', headers: { 'Accept': 'application/json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('http ' + r.status);
+          return r.json();
+        })
+        .then(function (d) {
+          if (!d || !d.total || !Array.isArray(d.pages)) throw new Error('bad payload');
+          renderKpis(d);
+          renderDays(d);
+          renderPages(d);
+        })
+        .catch(function () {
+          fail('统计接口不可用（静态托管环境没有 /api/visit）');
+        });
+    })();
+  </script>
+</body>
+</html>
